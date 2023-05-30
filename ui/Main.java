@@ -1,7 +1,7 @@
 package ui;
 
 import java.util.Scanner;
-import model.*;
+import model.Game;
 
 public class Main {
 
@@ -15,12 +15,14 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-        int option = 0;
 
-        do {
-            option = main.getOptionShowMenu();
-            main.executeOption(option);
-        } while (option != 0);
+        int option = 0;
+        /*
+         * do {
+         * option = main.getOptionShowMenu();
+         * main.executeOption(option);
+         * } while (option != 0);
+         */
 
         main.getReader().close();
     }
@@ -55,26 +57,26 @@ public class Main {
     public void executeOption(int option) {
         switch (option) {
             case 1:
-                String msj = controller.loadData();
+                // String msj = controller.loadData();
                 System.out.println("<<PASSENGERS DATA LOADED>>");
-                System.out.println(msj);
+                // System.out.println(msj);
 
                 break;
             case 2:
-                System.out.println(controller.printListPassengers());
+                // System.out.println(controller.printListPassengers());
 
                 break;
             case 3:
-                System.out.println(controller.printListBoarding());
+                // System.out.println(controller.printListBoarding());
                 break;
             case 4:
-                System.out.println(controller.printListDisembarkation());
+                // System.out.println(controller.printListDisembarkation());
                 break;
             case 0:
-                System.out.println("Program Finish");
+                // System.out.println("Program Finish");
                 break;
             default:
-                System.out.println("Invalid Option");
+                // System.out.println("Invalid Option");
                 break;
         }
     }

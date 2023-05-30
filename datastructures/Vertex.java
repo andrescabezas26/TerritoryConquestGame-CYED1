@@ -1,31 +1,68 @@
 package datastructures;
 
+import java.util.ArrayList;
+
 /**
  * This is a Java class that represents a vertex in a graph data structure.
  *
  * @param <T>
  */
-public class VertexMatrix<T> {
+public class Vertex<T> implements Comparable<Vertex<T>> {
     private T value;
     private Color color;
     private int distance;
     private int time;
-    private VertexMatrix<T> predecessor;
+    private Vertex<T> predecessor;
+    private ArrayList<Edge<T>> adjacents;
     private double key;
 
-    public VertexMatrix(T value) {
+    public Vertex(T value) {
         this.value = value;
         this.color = Color.WHITE;
         this.distance = Integer.MAX_VALUE;
         this.time = 0;
         this.predecessor = null;
+        this.adjacents = new ArrayList<>();
     }
 
-    /**
-     * @return T return the value
-     */
     public T getValue() {
         return value;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public int getDistance() {
+        return distance;
+    }
+
+    public void setDistance(int distance) {
+        this.distance = distance;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public Vertex<T> getPredecessor() {
+        return predecessor;
+    }
+
+    public void setPredecessor(Vertex<T> predecessor) {
+        this.predecessor = predecessor;
+    }
+
+    public ArrayList<Edge<T>> getAdjacents() {
+        return adjacents;
     }
 
     /**
@@ -36,59 +73,10 @@ public class VertexMatrix<T> {
     }
 
     /**
-     * @return Color return the color
+     * @param adjacents the adjacents to set
      */
-    public Color getColor() {
-        return color;
-    }
-
-    /**
-     * @param color the color to set
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    /**
-     * @return int return the distance
-     */
-    public int getDistance() {
-        return distance;
-    }
-
-    /**
-     * @param distance the distance to set
-     */
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    /**
-     * @return int return the time
-     */
-    public int getTime() {
-        return time;
-    }
-
-    /**
-     * @param time the time to set
-     */
-    public void setTime(int time) {
-        this.time = time;
-    }
-
-    /**
-     * @return VertexMatrix<T> return the predecessor
-     */
-    public VertexMatrix<T> getPredecessor() {
-        return predecessor;
-    }
-
-    /**
-     * @param predecessor the predecessor to set
-     */
-    public void setPredecessor(VertexMatrix<T> predecessor) {
-        this.predecessor = predecessor;
+    public void setAdjacents(ArrayList<Edge<T>> adjacents) {
+        this.adjacents = adjacents;
     }
 
     /**
@@ -105,4 +93,8 @@ public class VertexMatrix<T> {
         this.key = key;
     }
 
+    @Override
+    public int compareTo(Vertex<T> other) {
+        return Double.compare(this.key, other.key);
+    }
 }

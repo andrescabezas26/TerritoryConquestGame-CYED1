@@ -93,22 +93,6 @@ public interface IGraph<T> {
     public void removeVertex(T value);
 
     /**
-     * The function "prim" takes a starting vertex and returns a list of edges using
-     * the Prim's
-     * algorithm.
-     * 
-     * @param startVertex The startVertex parameter is a Vertex object that
-     *                    represents the starting
-     *                    vertex for the Prim's algorithm. The algorithm will start
-     *                    building the minimum spanning tree
-     *                    from this vertex.
-     * @return A list of edges that form a minimum spanning tree starting from the
-     *         given startVertex
-     *         using the Prim's algorithm.
-     */
-    public List<Edge<T>> prim(Vertex<T> startVertex);
-
-    /**
      * The function searches for a vertex with a given value in a graph.
      * 
      * @param value The value parameter in the method signature represents the value
@@ -135,7 +119,7 @@ public interface IGraph<T> {
      *                       may
      * @return The method `printMST` is expected to return a `String` value.
      */
-    public String printMST(int positionVertex);
+    public List<Edge<T>> prim(T vertexValue);
 
     /**
      * This function returns a string representation of the adjacent vertices of a

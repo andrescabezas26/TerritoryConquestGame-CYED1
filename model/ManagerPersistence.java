@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import datastructures.GraphMatrix;
+import datastructures.*;
 
 public class ManagerPersistence {
 
@@ -34,6 +34,40 @@ public class ManagerPersistence {
 
         try {
             countriesFile = new FileReader(projectDir + "/data/Countries.txt");
+            lectorC = new BufferedReader(countriesFile);
+
+            String linea = lectorC.readLine();
+            String countries = "";
+
+            while (linea != null) {
+                countries += linea + "\n";
+                linea = lectorC.readLine();
+            }
+
+            return countries;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (lectorC != null)
+                    lectorC.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    public String getEdges() {
+        File projectDir = new File(System.getProperty("user.dir"));
+
+        FileReader countriesFile = null;
+        BufferedReader lectorC = null;
+
+        try {
+            countriesFile = new FileReader(projectDir + "/data/Edge.txt");
             lectorC = new BufferedReader(countriesFile);
 
             String linea = lectorC.readLine();

@@ -15,15 +15,33 @@ import java.util.Queue;
  */
 public class GraphMatrix<T> implements IGraph<T> {
     private int time;
-    private ArrayList<VertexMatrix<T>> vertices;
+    private ArrayList<Vertex<T>> vertices;
     private boolean isDirected;
     private int[][] adjacentMatrix;
+    private double[][] dist;
+    private T[][] next;
 
     public GraphMatrix(boolean isDirected) {
         this.time = 0;
         this.isDirected = isDirected;
         this.vertices = new ArrayList<>();
         this.adjacentMatrix = new int[50][50];
+    }
+
+    private void initializeDistances() {
+        int numVertices = adjacentMatrix.length;
+
+        for (int i = 0; i < numVertices; i++) {
+            for (int j = 0; j < numVertices; j++) {
+                dist[i][j] = adjacentMatrix[i][j];
+
+                if (i != j && adjacentMatrix[i][j] != Double.MAX_VALUE) {
+                    next[i][j] = j;
+                } else {
+                    next[i][j] = -1;
+                }
+            }
+        }
     }
 
     /**
@@ -34,13 +52,13 @@ public class GraphMatrix<T> implements IGraph<T> {
      */
     @Override
     public String addVertex(T vertexToAdd) {
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(vertexToAdd)) {
                 return "Cannot add the vertex (a vertex with the same value already exists)";
             }
         }
 
-        vertices.add(new VertexMatrix<T>(vertexToAdd));
+        vertices.add(new Vertex<T>(vertexToAdd));
         return "The vertex has been added";
     }
 
@@ -52,10 +70,10 @@ public class GraphMatrix<T> implements IGraph<T> {
     // the graph is undirected, it also adds a reverse edge between the two
     // vertices.
     public void addEdge(T value1, T value2, double weight) {
-        VertexMatrix<T> vertex1 = null;
-        VertexMatrix<T> vertex2 = null;
+        Vertex<T> vertex1 = null;
+        Vertex<T> vertex2 = null;
 
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(value1)) {
                 vertex1 = vertex;
             }
@@ -87,8 +105,8 @@ public class GraphMatrix<T> implements IGraph<T> {
      *         `null` if no such vertex is found in the list of vertices.
      */
     @Override
-    public VertexMatrix<T> searchVertex(T value) {
-        for (VertexMatrix<T> vertex : vertices) {
+    public Vertex<T> searchVertex(T value) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(value)) {
                 return vertex;
             }
@@ -103,14 +121,14 @@ public class GraphMatrix<T> implements IGraph<T> {
      */
     @Override
     public void DFS() {
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             vertex.setColor(Color.WHITE);
             vertex.setPredecessor(null);
         }
 
         time = 0;
 
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getColor() == Color.WHITE) {
                 DFSVisit(vertex);
             }
@@ -131,8 +149,8 @@ public class GraphMatrix<T> implements IGraph<T> {
      *         algorithm.
      */
     @Override
-    public List<Edge<T>> prim(VertexMatrix<T> startVertex) {
-        for (VertexMatrix<T> vertex : vertices) {
+    public List<Edge<T>> prim(Vertex<T> startVertex) {
+        for (Vertex<T> vertex : vertices) {
             vertex.setKey(Double.POSITIVE_INFINITY);
             vertex.setColor(Color.WHITE);
         }
@@ -140,17 +158,17 @@ public class GraphMatrix<T> implements IGraph<T> {
         startVertex.setKey(0);
         startVertex.setPredecessor(null);
 
-        PriorityQueue<VertexMatrix<T>> queue = new PriorityQueue<>();
+        PriorityQueue<Vertex<T>> queue = new PriorityQueue<>();
         queue.add(startVertex);
 
         List<Edge<T>> minimumSpanningTree = new ArrayList<>();
 
         while (!queue.isEmpty()) {
-            VertexMatrix<T> currentVertex = queue.poll();
+            Vertex<T> currentVertex = queue.poll();
             currentVertex.setColor(Color.BLACK);
 
             for (Edge<T> edge : currentVertex.getAdjacents()) {
-                VertexMatrix<T> adjacentVertex = edge.getVertex2();
+                Vertex<T> adjacentVertex = edge.getVertex2();
                 if (adjacentVertex.getColor() == Color.WHITE && edge.getWeight() < adjacentVertex.getKey()) {
                     adjacentVertex.setKey(edge.getWeight());
                     adjacentVertex.setPredecessor(currentVertex);
@@ -160,8 +178,8 @@ public class GraphMatrix<T> implements IGraph<T> {
             }
         }
 
-        for (VertexMatrix<T> vertex : vertices) {
-            VertexMatrix<T> predecessor = vertex.getPredecessor();
+        for (Vertex<T> vertex : vertices) {
+            Vertex<T> predecessor = vertex.getPredecessor();
             if (predecessor != null) {
                 for (Edge<T> edge : vertex.getAdjacents()) {
                     if (edge.getVertex2().equals(predecessor)) {
@@ -207,6 +225,22 @@ public class GraphMatrix<T> implements IGraph<T> {
 
     }
 
+    private void floyd_Marshall() {
+        int numVertices = adjacentMatrix.length;
+
+        for (int k = 0; k < numVertices; k++) {
+            for (int i = 0; i < numVertices; i++) {
+                for (int j = 0; j < numVertices; j++) {
+                    if (dist[i][k] != Double.MAX_VALUE && dist[k][j] != Double.MAX_VALUE
+                            && dist[i][k] + dist[k][j] < dist[i][j]) {
+                        dist[i][j] = dist[i][k] + dist[k][j];
+                        next[i][j] = next[i][k];
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * This is a BFS (Breadth-First Search) algorithm implemented in Java to
      * traverse a graph starting
@@ -216,10 +250,10 @@ public class GraphMatrix<T> implements IGraph<T> {
      */
     @Override
     public void BFS(T originBFS) {
-        Queue<VertexMatrix<T>> vQueue = new LinkedList<>();
-        VertexMatrix<T> originBFSVertex = new VertexMatrix<T>(originBFS);
+        Queue<Vertex<T>> vQueue = new LinkedList<>();
+        Vertex<T> originBFSVertex = new Vertex<T>(originBFS);
 
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getValue() != originBFS) {
                 vertex.setColor(Color.WHITE);
                 vertex.setDistance(Integer.MAX_VALUE);
@@ -235,11 +269,11 @@ public class GraphMatrix<T> implements IGraph<T> {
         vQueue.add(originBFSVertex);
 
         while (!vQueue.isEmpty()) {
-            VertexMatrix<T> actual = vQueue.poll();
+            Vertex<T> actual = vQueue.poll();
 
             if (actual != null) {
                 for (Edge<T> edge : actual.getAdjacents()) {
-                    VertexMatrix<T> vertex = edge.getVertex2();
+                    Vertex<T> vertex = edge.getVertex2();
                     if (vertex.getColor() == Color.WHITE) {
                         vertex.setColor(Color.GRAY);
                         vertex.setDistance(actual.getDistance() + 1);
@@ -261,13 +295,13 @@ public class GraphMatrix<T> implements IGraph<T> {
      * @param vertex The vertex that is currently being visited in the depth-first
      *               search algorithm.
      */
-    private void DFSVisit(VertexMatrix<T> vertex) {
+    private void DFSVisit(Vertex<T> vertex) {
         time++;
         vertex.setDistance(time);
         vertex.setColor(Color.GRAY);
 
         for (Edge<T> edge : vertex.getAdjacents()) {
-            VertexMatrix<T> v = edge.getVertex2();
+            Vertex<T> v = edge.getVertex2();
             if (v.getColor().equals(Color.WHITE)) {
                 v.setPredecessor(vertex);
                 DFSVisit(v);
@@ -279,7 +313,7 @@ public class GraphMatrix<T> implements IGraph<T> {
         vertex.setTime(time);
     }
 
-    public ArrayList<VertexMatrix<T>> getVertices() {
+    public ArrayList<Vertex<T>> getVertices() {
         return vertices;
     }
 
@@ -290,9 +324,9 @@ public class GraphMatrix<T> implements IGraph<T> {
      */
     @Override
     public void removeVertex(T value) {
-        VertexMatrix<T> vertexToRemove = null;
+        Vertex<T> vertexToRemove = null;
 
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(value)) {
                 vertexToRemove = vertex;
                 break;
@@ -302,7 +336,7 @@ public class GraphMatrix<T> implements IGraph<T> {
         if (vertexToRemove != null) {
             vertices.remove(vertexToRemove);
 
-            for (VertexMatrix<T> vertex : vertices) {
+            for (Vertex<T> vertex : vertices) {
                 ArrayList<Edge<T>> adjacents = vertex.getAdjacents();
 
                 for (Edge<T> edge : new ArrayList<>(adjacents)) {
@@ -323,10 +357,10 @@ public class GraphMatrix<T> implements IGraph<T> {
      */
     @Override
     public void removeEdge(T value1, T value2) {
-        VertexMatrix<T> vertex1 = null;
-        VertexMatrix<T> vertex2 = null;
+        Vertex<T> vertex1 = null;
+        Vertex<T> vertex2 = null;
 
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(value1)) {
                 vertex1 = vertex;
             }
@@ -379,7 +413,7 @@ public class GraphMatrix<T> implements IGraph<T> {
     @Override
     public String printGraph() {
         StringBuilder sb = new StringBuilder();
-        for (VertexMatrix<T> vertex : vertices) {
+        for (Vertex<T> vertex : vertices) {
             sb.append("Vertex: ").append(vertex.getValue()).append("\n");
             sb.append("Distance: ").append(vertex.getDistance()).append("\n");
             sb.append("Time: ").append(vertex.getTime()).append("\n");
@@ -395,7 +429,7 @@ public class GraphMatrix<T> implements IGraph<T> {
     /**
      * @param vertices the vertices to set
      */
-    public void setVertices(ArrayList<VertexMatrix<T>> vertices) {
+    public void setVertices(ArrayList<Vertex<T>> vertices) {
         this.vertices = vertices;
     }
 
