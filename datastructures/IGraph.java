@@ -1,6 +1,7 @@
 package datastructures;
 
 import java.util.List;
+import java.util.Map;
 
 // Declaring a generic interface named `Graph` with a type parameter `T`. This means that any class
 // that implements this interface will have to specify the type of `T` they want to use. The methods
@@ -21,6 +22,35 @@ public interface IGraph<T> {
      */
     public void BFS(T origin);
 
+     /**
+     * This function performs Dijkstra's algorithm on a graph starting from a specified vertex and
+     * returns a map of the shortest distances to each vertex from the starting vertex.
+     * 
+     * @param startVertexValue startVertexValue is the value of the vertex from which the Dijkstra's
+     * algorithm will start finding the shortest path to all other vertices in the graph. In other
+     * words, it is the starting point or the source vertex for the algorithm.
+     * @return The method `dijkstra` is returning a `Map` object that maps a vertex of type `T` to a
+     * `Double` value representing the shortest distance from the start vertex to that vertex.
+     */
+    public Map<T, Double> dijkstra(T startVertexValue);
+
+    /**
+     * The function returns a list of edges using the Prim's algorithm for a given
+     * vertex value.
+     * 
+     * @param vertexValue The parameter "vertexValue" is the value of the starting
+     *                    vertex for the
+     *                    Prim's algorithm. Prim's algorithm is a greedy algorithm
+     *                    used to find the minimum spanning tree
+     *                    of a weighted undirected graph. The algorithm starts with
+     *                    a single vertex and gradually adds
+     *                    edges to the tree until all vertices are included and
+     * @return A list of edges that form a minimum spanning tree using the Prim's
+     *         algorithm, starting
+     *         from the vertex with the given value.
+     */
+    public List<Edge<T>> prim(T vertexValue);
+
     /**
      * The function DFS() is declared in Java.
      */
@@ -39,6 +69,17 @@ public interface IGraph<T> {
      * @return A String value is being returned.
      */
     public String addVertex(T newValue);
+
+    /**
+     * The function floydWarshall() returns a 2D array that represents the shortest
+     * path between all
+     * pairs of vertices in a graph using the Floyd-Warshall algorithm.
+     * 
+     * @return A 2D array of doubles representing the shortest distances between all
+     *         pairs of vertices
+     *         in a graph using the Floyd-Warshall algorithm.
+     */
+    public double[][] floydWarshall();
 
     /**
      * This function adds an edge between two nodes with a specified weight in a
@@ -107,19 +148,28 @@ public interface IGraph<T> {
     public int searchVertex(T value);
 
     /**
-     * This function prints the minimum spanning tree of a graph starting from a
-     * specified vertex.
+     * The function kruskal() returns a list of edges using Kruskal's algorithm.
      * 
-     * @param positionVertex The parameter "positionVertex" is an integer that
-     *                       represents the position
-     *                       or index of a vertex in a graph. It is used in a method
-     *                       called "printMST" which is likely used
-     *                       to print the minimum spanning tree (MST) of a graph
-     *                       starting from a specific vertex. The method
-     *                       may
-     * @return The method `printMST` is expected to return a `String` value.
+     * @return A list of edges representing the minimum spanning tree found using
+     *         Kruskal's algorithm.
      */
-    public List<Edge<T>> prim(T vertexValue);
+    public List<Edge<T>> kruskal();
+
+    /**
+     * This function takes a list of edges and returns a string representation of a
+     * minimum spanning
+     * tree.
+     * 
+     * @param minimunSpanningTree The parameter `minimumSpanningTree` is a list of
+     *                            `Edge` objects
+     *                            representing the edges in a minimum spanning tree
+     *                            of a graph. A minimum spanning tree is a tree
+     *                            that spans all the vertices in a connected,
+     *                            undirected graph with the minimum possible total
+     *                            edge weight. The `Edge` class
+     * @return The method `printPrim` is expected to return a `String` value.
+     */
+    public String printPrim(List<Edge<T>> minimunSpanningTree);
 
     /**
      * This function returns a string representation of the adjacent vertices of a

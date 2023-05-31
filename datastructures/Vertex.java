@@ -25,6 +25,16 @@ public class Vertex<T> implements Comparable<Vertex<T>> {
         this.adjacents = new ArrayList<>();
     }
 
+    public String printAdjacentsAndWeight() {
+        StringBuilder msj = new StringBuilder();
+        msj.append("TERRITORY   TROOPS_REQUIRED");
+        for (int i = 0; i < adjacents.size(); i++) {
+            msj.append("\n"+(i + 1) + ") ").append(adjacents.get(i).getVertex2().getValue())
+                    .append(" " + adjacents.get(i).getWeight());
+        }
+        return msj.toString();
+    }
+
     public T getValue() {
         return value;
     }

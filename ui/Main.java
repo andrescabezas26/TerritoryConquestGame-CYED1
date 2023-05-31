@@ -16,15 +16,33 @@ public class Main {
     public static void main(String[] args) {
         Main main = new Main();
 
-        int option = 0;
-        /*
-         * do {
-         * option = main.getOptionShowMenu();
-         * main.executeOption(option);
-         * } while (option != 0);
-         */
+        System.out.println("\n<<<<< Welcome to Territory Conquest Game >>>>>");
+        System.out.println(main.map());
+
+        int option = 1;
+
+        do {
+            option = main.getOptionShowMenu();
+            main.executeOption(option);
+        } while (option != 2);
 
         main.getReader().close();
+    }
+
+    public String map() {
+        return ""
+                + "\n**********************"
+                + "\n*******EEUU***********"
+                + "\n  ******************* "
+                + "\n  ******************  "
+                + "\n    ************      "
+                + "\n      ********        "
+                + "\n          ***     **  "
+                + "\n            **  ***  *"
+                + "\n              ********"
+                + "\n             ****COL**"
+                + "\n              ********"
+                + "\n             *********\n";
     }
 
     /**
@@ -35,13 +53,27 @@ public class Main {
     public int getOptionShowMenu() {
         int option = -1;
         while (option == -1) {
-            System.out.println("\n<<<<< Welcome to Integrative Airline >>>>>");
+            
             System.out.println(
-                    "1. Load data of passengers\n" +
-                            "2. See list of loaded passengers \n" +
-                            "3. See Boarding Arrival List\n" +
-                            "4. See Disembarkation List\n" +
-                            "0. Exit\n");
+                    "1. Play \t" +
+                            "2. Exit\n");
+
+            option = validateIntegerOption();
+        }
+
+        return option;
+    }
+
+    public int getPlayOptionShowMenu() {
+        int option = -1;
+        while (option == -1) {
+
+            System.out.println(
+                    "1. See Conquested Territories \n" +
+                            "2. See Actual Territory\n" +
+                            "3. See Minimum Path to a Territory\n" +
+                            "4. Conquist Territory" +
+                            "0. Exit \n");
 
             option = validateIntegerOption();
         }
@@ -58,25 +90,46 @@ public class Main {
         switch (option) {
             case 1:
                 // String msj = controller.loadData();
-                System.out.println("<<PASSENGERS DATA LOADED>>");
-                // System.out.println(msj);
+                System.out.println("<<GAME STARTED>>");
+                int playOption = 1;
+                int player=1;
+                while (playOption != 0) {
+                    System.out.println("PLAYER " + player + " TURN");
+                    playOption = getPlayOptionShowMenu();
+                    executePlayOption(playOption,player);
+                    if(player==1){
+                        player=2;
+                    }else{
+                        player=1;
+                    }
+                }
 
                 break;
             case 2:
-                // System.out.println(controller.printListPassengers());
+                System.out.println("<<FINISH>>");
+                break;
+            default:
+                System.out.println("Invalid option");
+                break;
+        }
+    }
+
+    public void executePlayOption(int option, int player) {
+        switch (option) {
+            case 1:
+                System.out.println(controller.printPlayerTerritories(player-1));
+                break;
+            case 2:
 
                 break;
             case 3:
-                // System.out.println(controller.printListBoarding());
+
                 break;
             case 4:
-                // System.out.println(controller.printListDisembarkation());
-                break;
-            case 0:
-                // System.out.println("Program Finish");
+
                 break;
             default:
-                // System.out.println("Invalid Option");
+
                 break;
         }
     }

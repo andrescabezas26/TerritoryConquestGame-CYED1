@@ -6,12 +6,14 @@ public class Player {
 
     private String name;
     private ArrayList<String> conquistedCountries;
+    private int troops;
     private double score;
 
     public Player(String name) {
         this.name = name;
         this.conquistedCountries = new ArrayList<>();
         this.score = 0;
+        this.troops = 100000;
     }
 
     /**
@@ -54,6 +56,21 @@ public class Player {
      */
     public void setScore(double score) {
         this.score = score;
+    }
+
+
+    /**
+     * @return int return the troops
+     */
+    public int getTroops() {
+        return troops;
+    }
+
+    /**
+     * @param troops the troops to set
+     */
+    public void setTroops(int troops) {
+        this.troops = troops;
     }
 
 }

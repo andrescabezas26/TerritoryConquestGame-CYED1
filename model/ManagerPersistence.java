@@ -67,7 +67,7 @@ public class ManagerPersistence {
         BufferedReader lectorC = null;
 
         try {
-            countriesFile = new FileReader(projectDir + "/data/Edge.txt");
+            countriesFile = new FileReader(projectDir + "/data/Edges.txt");
             lectorC = new BufferedReader(countriesFile);
 
             String linea = lectorC.readLine();

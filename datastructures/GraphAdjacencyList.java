@@ -1,14 +1,6 @@
 package datastructures;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-
-import com.google.gson.Gson;
+import java.util.*;
 
 /**
  * This is a Java class that represents a graph using an adjacency list and
@@ -21,8 +13,6 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
     private int time;
     private ArrayList<Vertex<T>> vertices;
     private boolean isDirected;
-    private double[][] dist;
-    private T[][] next;
 
     public GraphAdjacencyList(boolean isDirected) {
         this.time = 0;
@@ -209,6 +199,7 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
      *         information about each edge in the
      *         tree, including the vertices it connects and its weight.
      */
+    @Override
     public String printPrim(List<Edge<T>> minimunSpanningTree) {
 
         if (minimunSpanningTree == null) {
@@ -229,49 +220,97 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
 
     }
 
-    // The above code is likely implementing the Floyd-Warshall algorithm, which is
-    // used to find the
-    // shortest path between all pairs of vertices in a weighted graph. However,
-    // without the full
-    // implementation of the method and context of the program, it is difficult to
-    // determine the exact
-    // purpose of the code.
-    public void floydWarshall() {
+    /**
+     * This function applies the Floyd-Warshall algorithm to find the shortest paths
+     * between all pairs of vertices in the graph.
+     * 
+     * @return A 2D array of doubles representing the shortest distances between all
+     *         pairs of vertices. If there is no path between two vertices, the
+     *         distance is set to Double.POSITIVE_INFINITY.
+     */
+    @Override
+    public double[][] floydWarshall() {
         int numVertices = vertices.size();
-        this.dist = new double[numVertices][numVertices];
-        this.next = (T[][]) new Object[numVertices][numVertices];
+        double[][] distances = new double[numVertices][numVertices];
 
-        // Inicializar la matriz de distancias con infinito y la matriz de "next" con
-        // null
-        for (int i = 0; i < numVertices; i++) {
-            for (int j = 0; j < numVertices; j++) {
-                dist[i][j] = Double.POSITIVE_INFINITY;
-                next[i][j] = null;
-            }
-        }
-
-        // Actualizar las distancias directas entre los vértices
+        // Initialize distances matrix with initial values
         for (int i = 0; i < numVertices; i++) {
             for (int j = 0; j < numVertices; j++) {
                 if (i == j) {
-                    dist[i][j] = 0;
-                    next[i][j] = vertices.get(i).getValue();
+                    distances[i][j] = 0;
+                } else {
+                    distances[i][j] = Double.POSITIVE_INFINITY;
                 }
             }
         }
 
-        // Calcular las distancias mínimas entre los vértices utilizando el algoritmo de
-        // Floyd Warshall
+        // Update distances matrix with edge weights
+        for (int i = 0; i < numVertices; i++) {
+            Vertex<T> vertex = vertices.get(i);
+            for (Edge<T> edge : vertex.getAdjacents()) {
+                Vertex<T> adjacent = edge.getVertex2();
+                int j = vertices.indexOf(adjacent);
+                distances[i][j] = edge.getWeight();
+            }
+        }
+
+        // Apply Floyd-Warshall algorithm
         for (int k = 0; k < numVertices; k++) {
             for (int i = 0; i < numVertices; i++) {
                 for (int j = 0; j < numVertices; j++) {
-                    if (dist[i][k] + dist[k][j] < dist[i][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];
-                        next[i][j] = next[i][k];
+                    if (distances[i][k] + distances[k][j] < distances[i][j]) {
+                        distances[i][j] = distances[i][k] + distances[k][j];
                     }
                 }
             }
         }
+
+        return distances;
+    }
+
+    /**
+     * This function implements Dijkstra's algorithm to find the shortest path from
+     * a given vertex to all other vertices in the graph.
+     *
+     * @param startVertexValue The value of the starting vertex.
+     * @return A map containing the shortest distances from the starting vertex to
+     *         all other vertices in the graph.
+     */
+    @Override
+    public Map<T, Double> dijkstra(T startVertexValue) {
+        Map<T, Double> distances = new HashMap<>();
+        PriorityQueue<Vertex<T>> queue = new PriorityQueue<>();
+
+        for (Vertex<T> vertex : vertices) {
+            if (vertex.getValue().equals(startVertexValue)) {
+                vertex.setDistance(0);
+                distances.put(vertex.getValue(), 0.0);
+            } else {
+                vertex.setDistance(Integer.MAX_VALUE);
+                distances.put(vertex.getValue(), Double.POSITIVE_INFINITY);
+            }
+
+            queue.add(vertex);
+        }
+
+        while (!queue.isEmpty()) {
+            Vertex<T> currentVertex = queue.poll();
+
+            for (Edge<T> edge : currentVertex.getAdjacents()) {
+                Vertex<T> adjacentVertex = edge.getVertex2();
+                double weight = edge.getWeight();
+                double currentDistance = currentVertex.getDistance();
+
+                if (currentDistance + weight < adjacentVertex.getDistance()) {
+                    queue.remove(adjacentVertex);
+                    adjacentVertex.setDistance((int) (currentDistance + weight));
+                    queue.add(adjacentVertex);
+                    distances.put(adjacentVertex.getValue(), currentDistance + weight);
+                }
+            }
+        }
+
+        return distances;
     }
 
     /**
@@ -491,6 +530,88 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
         return stringBuilder.toString();
     }
 
+     /**
+     * This function applies Kruskal's algorithm to find the minimum spanning tree
+     * of the graph.
+     *
+     * @return The list of edges that form the minimum spanning tree.
+     */
+    @Override
+    public List<Edge<T>> kruskal() {
+        List<Edge<T>> allEdges = new ArrayList<>();
+
+        // Collect all edges from the graph
+        for (Vertex<T> vertex : vertices) {
+            for (Edge<T> edge : vertex.getAdjacents()) {
+                allEdges.add(edge);
+            }
+        }
+
+        // Sort edges in ascending order by weight
+        Collections.sort(allEdges);
+
+        // Create a disjoint set to track the connected components
+        DisjointSet<T> disjointSet = new DisjointSet<>(vertices);
+
+        List<Edge<T>> minimumSpanningTree = new ArrayList<>();
+
+        for (Edge<T> edge : allEdges) {
+            Vertex<T> vertex1 = edge.getVertex1();
+            Vertex<T> vertex2 = edge.getVertex2();
+
+            // Check if adding this edge creates a cycle
+            if (!disjointSet.find(vertex1).equals(disjointSet.find(vertex2))) {
+                // The edge does not create a cycle, add it to the minimum spanning tree
+                minimumSpanningTree.add(edge);
+
+                // Merge the sets of the two vertices
+                disjointSet.union(vertex1, vertex2);
+            }
+        }
+
+        return minimumSpanningTree;
+    }
+
+    /**
+     * This class represents a disjoint set data structure used in Kruskal's
+     * algorithm.
+     *
+     * @param <T> The type of the elements in the disjoint set.
+     */
+    private static class DisjointSet<T> {
+        private Map<Vertex<T>, Vertex<T>> parent;
+
+        public DisjointSet(List<Vertex<T>> vertices) {
+            parent = new HashMap<>();
+            makeSets(vertices);
+        }
+
+        private void makeSets(List<Vertex<T>> vertices) {
+            for (Vertex<T> vertex : vertices) {
+                parent.put(vertex, vertex);
+            }
+        }
+
+        public Vertex<T> find(Vertex<T> vertex) {
+            if (parent.get(vertex) == vertex) {
+                return vertex;
+            }
+
+            // Path compression
+            Vertex<T> root = find(parent.get(vertex));
+            parent.put(vertex, root);
+            return root;
+        }
+
+        public void union(Vertex<T> vertex1, Vertex<T> vertex2) {
+            Vertex<T> root1 = find(vertex1);
+            Vertex<T> root2 = find(vertex2);
+            parent.put(root1, root2);
+        }
+    }
+
+
+
     /**
      * @param vertices the vertices to set
      */
@@ -510,54 +631,6 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
      */
     public void setIsDirected(boolean isDirected) {
         this.isDirected = isDirected;
-    }
-
-    /**
-     * @return T[][] return the next
-     */
-    public T[][] getNext() {
-        return next;
-    }
-
-    /**
-     * @param next the next to set
-     */
-    public void setNext(T[][] next) {
-        this.next = next;
-    }
-
-    @Override
-    public String toString() {
-        // Devuelve una representación en cadena del grafo
-        // Aquí puedes definir la lógica para convertir el grafo a una cadena
-        // con el formato deseado
-        // Por ejemplo, podrías recorrer los vértices y las aristas y construir una
-        // cadena con esa información
-        // y retornarla
-
-        // Ejemplo:
-        StringBuilder sb = new StringBuilder();
-        for (Vertex<T> vertex : vertices) {
-            sb.append(vertex.getValue()).append(": ");
-            for (Edge<T> edge : vertex.getAdjacents()) {
-                sb.append(edge.getVertex2().getValue()).append(", ");
-            }
-            sb.delete(sb.length() - 2, sb.length()); // Eliminar la última coma y el espacio
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    public String toJson() {
-        // Utiliza Gson para convertir el objeto a una cadena JSON
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-
-    public static GraphAdjacencyList<String> fromJson(String json) {
-        // Utiliza Gson para convertir una cadena JSON en un objeto GraphAdjacencyList
-        Gson gson = new Gson();
-        return gson.fromJson(json, GraphAdjacencyList.class);
     }
 
 }
