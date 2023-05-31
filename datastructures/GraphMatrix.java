@@ -1,56 +1,55 @@
 package datastructures;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 /**
  * This is a Java class that represents a graph using an adjacency list and
  * provides methods for
  * breadth-first search (BFS) and depth-first search (DFS).
- *ss
+ * ss
+ * 
  * @param <T>
  */
-public class GraphMatrix<T> implements IGraph<T> {
+public class GraphMatrix<T> {
     private int time;
     private ArrayList<Vertex<T>> vertices;
     private boolean isDirected;
-    private int[][] adjacentMatrix;
-    private double[][] dist;
-    private T[][] next;
+    private double[][] adjacencyMatrix;
 
     public GraphMatrix(boolean isDirected) {
         this.time = 0;
         this.isDirected = isDirected;
         this.vertices = new ArrayList<>();
-        this.adjacentMatrix = new int[50][50];
+        this.adjacencyMatrix = new double[0][0];
     }
 
-    private void initializeDistances() {
-        int numVertices = adjacentMatrix.length;
-
-        for (int i = 0; i < numVertices; i++) {
-            for (int j = 0; j < numVertices; j++) {
-                dist[i][j] = adjacentMatrix[i][j];
-
-                if (i != j && adjacentMatrix[i][j] != Double.MAX_VALUE) {
-                    next[i][j] = j;
-                } else {
-                    next[i][j] = -1;
-                }
-            }
-        }
-    }
-
-    /**
-     * This function adds a new vertex with a given value to a list of vertices.
-     *
-     * @param vertexToAdd The value of the new vertex that is being added to the
-     *                    graph.
+    /*
+     * private void initializeDistances() {
+     * int numVertices = adjacencyMatrix.length;
+     * 
+     * for (int i = 0; i < numVertices; i++) {
+     * for (int j = 0; j < numVertices; j++) {
+     * dist[i][j] = adjacencyMatrix[i][j];
+     * 
+     * if (i != j && adjacencyMatrix[i][j] != Double.MAX_VALUE) {
+     * next[i][j] = j;
+     * } else {
+     * next[i][j] = -1;
+     * }
+     * }
+     * }
+     * }
      */
-    @Override
+
     public String addVertex(T vertexToAdd) {
         for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(vertexToAdd)) {
@@ -58,53 +57,46 @@ public class GraphMatrix<T> implements IGraph<T> {
             }
         }
 
-        vertices.add(new Vertex<T>(vertexToAdd));
+        int oldSize = vertices.size();
+        int newSize = oldSize + 1;
+
+        double[][] newMatrix = new double[newSize][newSize];
+
+        for (int i = 0; i < oldSize; i++) {
+            System.arraycopy(adjacencyMatrix[i], 0, newMatrix[i], 0, oldSize);
+            newMatrix[i][newSize - 1] = Double.POSITIVE_INFINITY;
+            newMatrix[newSize - 1][i] = Double.POSITIVE_INFINITY;
+        }
+
+        this.adjacencyMatrix = newMatrix;
+        vertices.add(new Vertex<>(vertexToAdd));
+
         return "The vertex has been added";
     }
 
-    @Override
-    // The `addEdge` method is adding an edge between two vertices in the graph
-    // represented by their
-    // values `value1` and `value2`, with an optional weight specified by the
-    // `weight` parameter. If
-    // the graph is undirected, it also adds a reverse edge between the two
-    // vertices.
     public void addEdge(T value1, T value2, double weight) {
-        Vertex<T> vertex1 = null;
-        Vertex<T> vertex2 = null;
+        int index1 = searchVertexIndex(value1);
+        int index2 = searchVertexIndex(value2);
 
-        for (Vertex<T> vertex : vertices) {
-            if (vertex.getValue().equals(value1)) {
-                vertex1 = vertex;
-            }
-
-            if (vertex.getValue().equals(value2)) {
-                vertex2 = vertex;
-            }
-        }
-
-        if (vertex1 != null && vertex2 != null) {
-            Edge<T> edge = new Edge<>(vertex1, vertex2, weight);
-            vertex1.getAdjacents().add(edge);
+        if (index1 != -1 && index2 != -1) {
+            adjacencyMatrix[index1][index2] = weight;
 
             if (!isDirected) {
-                Edge<T> reverseEdge = new Edge<>(vertex2, vertex1, weight);
-                vertex2.getAdjacents().add(reverseEdge);
+                adjacencyMatrix[index2][index1] = weight;
             }
         }
     }
 
-    /**
-     * This function searches for a vertex with a specific value in a list of
-     * vertices and returns it
-     * if found, otherwise returns null.
-     * 
-     * @param value The value of the vertex that we are searching for in the graph.
-     * @return The method `searchVertex` returns a `Vertex<T>` object that matches
-     *         the given value, or
-     *         `null` if no such vertex is found in the list of vertices.
-     */
-    @Override
+    public int searchVertexIndex(T value) {
+        for (int i = 0; i < vertices.size(); i++) {
+            if (vertices.get(i).getValue().equals(value)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public Vertex<T> searchVertex(T value) {
         for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(value)) {
@@ -114,12 +106,160 @@ public class GraphMatrix<T> implements IGraph<T> {
         return null;
     }
 
-    /**
-     * This function performs a depth-first search on a graph represented by
-     * vertices and sets their
-     * colors and predecessors.
-     */
-    @Override
+    private List<Edge<T>> primCreator(Vertex<T> startVertex, double[][] adjacencyMatrix) {
+        int numVertices = adjacencyMatrix.length;
+        for (Vertex<T> vertex : vertices) {
+            vertex.setKey(Double.POSITIVE_INFINITY);
+            vertex.setColor(Color.WHITE);
+        }
+
+        startVertex.setKey(0);
+        startVertex.setPredecessor(null);
+
+        PriorityQueue<Vertex<T>> queue = new PriorityQueue<>();
+        queue.add(startVertex);
+
+        List<Edge<T>> minimumSpanningTree = new ArrayList<>();
+        Set<Vertex<T>> visited = new HashSet<>();
+
+        while (!queue.isEmpty()) {
+            Vertex<T> currentVertex = queue.poll();
+            if (visited.contains(currentVertex)) {
+                continue; // Skip if already visited
+            }
+            currentVertex.setColor(Color.BLACK);
+            visited.add(currentVertex);
+
+            int currentVertexIndex = searchVertexIndex(currentVertex.getValue());
+
+            for (int i = 0; i < numVertices; i++) {
+                if (adjacencyMatrix[currentVertexIndex][i] != 0 && i != currentVertexIndex) {
+                    Vertex<T> adjacentVertex = vertices.get(i);
+                    double weight = adjacencyMatrix[currentVertexIndex][i];
+
+                    if (!visited.contains(adjacentVertex) && weight < adjacentVertex.getKey()) {
+                        adjacentVertex.setKey(weight);
+                        adjacentVertex.setPredecessor(currentVertex);
+                        queue.remove(adjacentVertex);
+                        queue.add(adjacentVertex);
+
+                        minimumSpanningTree.add(new Edge<>(currentVertex, adjacentVertex, weight));
+                    }
+                }
+            }
+        }
+
+        return minimumSpanningTree;
+    }
+
+    public List<Edge<T>> prim(T vertexValue, double[][] adjacencyMatrix) {
+        int pos = searchVertexIndex(vertexValue);
+
+        if (pos == -1) {
+            return null;
+        }
+
+        return primCreator(vertices.get(pos), adjacencyMatrix);
+    }
+
+    public String printPrim(List<Edge<T>> minimumSpanningTree) {
+        if (minimumSpanningTree == null) {
+            return "El vértice no existe en el grafo.";
+        }
+
+        StringBuilder sb = new StringBuilder("Minimum Spanning Tree");
+
+        for (Edge<T> edge : minimumSpanningTree) {
+            sb.append("\n Edge: ").append(edge.getVertex1().getValue()).append(" -- ")
+                    .append(edge.getVertex2().getValue())
+                    .append(" Weight:  ").append(edge.getWeight());
+        }
+
+        return sb.toString();
+    }
+
+    public double[][] floydWarshall() {
+        int numVertices = vertices.size();
+        double[][] distances = new double[numVertices][numVertices];
+
+        // Initialize distances matrix with initial values
+        for (int i = 0; i < numVertices; i++) {
+            for (int j = 0; j < numVertices; j++) {
+                if (i == j) {
+                    distances[i][j] = 0;
+                } else {
+                    distances[i][j] = Double.POSITIVE_INFINITY;
+                }
+            }
+        }
+
+        // Update distances based on the edges
+        for (int i = 0; i < numVertices; i++) {
+            for (int j = 0; j < numVertices; j++) {
+                if (adjacencyMatrix[i][j] != 0) {
+                    distances[i][j] = adjacencyMatrix[i][j];
+                }
+            }
+        }
+
+        // Perform the Floyd-Warshall algorithm
+        for (int k = 0; k < numVertices; k++) {
+            for (int i = 0; i < numVertices; i++) {
+                for (int j = 0; j < numVertices; j++) {
+                    if (distances[i][k] + distances[k][j] < distances[i][j]) {
+                        distances[i][j] = distances[i][k] + distances[k][j];
+                    }
+                }
+            }
+        }
+
+        return distances;
+    }
+
+    public void BFS(T originBFS) {
+        Queue<Vertex<T>> vQueue = new LinkedList<>();
+
+        int numVertices = vertices.size();
+        int originIndex = searchVertexIndex(originBFS);
+
+        for (int i = 0; i < numVertices; i++) {
+            if (i != originIndex) {
+                Vertex<T> vertex = vertices.get(i);
+                vertex.setColor(Color.WHITE);
+                vertex.setDistance(Integer.MAX_VALUE);
+                vertex.setPredecessor(null);
+            } else {
+                Vertex<T> vertex = vertices.get(i);
+                vertex.setColor(Color.GRAY);
+                vertex.setDistance(0);
+                vertex.setPredecessor(null);
+                vQueue.add(vertex);
+            }
+        }
+
+        while (!vQueue.isEmpty()) {
+            Vertex<T> actual = vQueue.poll();
+
+            if (actual != null) {
+                int actualIndex = searchVertexIndex(actual.getValue());
+
+                for (int i = 0; i < numVertices; i++) {
+                    if (adjacencyMatrix[actualIndex][i] != 0) {
+                        Vertex<T> vertex = vertices.get(i);
+                        if (vertex.getColor() == Color.WHITE) {
+                            vertex.setColor(Color.GRAY);
+                            vertex.setDistance(actual.getDistance() + 1);
+                            vertex.setPredecessor(actual);
+                            vQueue.add(vertex);
+                        }
+                    }
+                }
+
+                actual.setColor(Color.BLACK);
+            }
+        }
+    }
+
     public void DFS() {
         for (Vertex<T> vertex : vertices) {
             vertex.setColor(Color.WHITE);
@@ -135,176 +275,21 @@ public class GraphMatrix<T> implements IGraph<T> {
         }
     }
 
-    /**
-     * The function implements Prim's algorithm to find the minimum spanning tree of
-     * a graph starting
-     * from a given vertex.
-     * 
-     * @param startVertex The starting vertex for the Prim's algorithm to find the
-     *                    minimum spanning
-     *                    tree.
-     * @return The method is returning a list of edges that form the minimum
-     *         spanning tree of the
-     *         graph, starting from the specified start vertex using the Prim's
-     *         algorithm.
-     */
-    @Override
-    public List<Edge<T>> prim(Vertex<T> startVertex) {
-        for (Vertex<T> vertex : vertices) {
-            vertex.setKey(Double.POSITIVE_INFINITY);
-            vertex.setColor(Color.WHITE);
-        }
-
-        startVertex.setKey(0);
-        startVertex.setPredecessor(null);
-
-        PriorityQueue<Vertex<T>> queue = new PriorityQueue<>();
-        queue.add(startVertex);
-
-        List<Edge<T>> minimumSpanningTree = new ArrayList<>();
-
-        while (!queue.isEmpty()) {
-            Vertex<T> currentVertex = queue.poll();
-            currentVertex.setColor(Color.BLACK);
-
-            for (Edge<T> edge : currentVertex.getAdjacents()) {
-                Vertex<T> adjacentVertex = edge.getVertex2();
-                if (adjacentVertex.getColor() == Color.WHITE && edge.getWeight() < adjacentVertex.getKey()) {
-                    adjacentVertex.setKey(edge.getWeight());
-                    adjacentVertex.setPredecessor(currentVertex);
-                    queue.remove(adjacentVertex);
-                    queue.add(adjacentVertex);
-                }
-            }
-        }
-
-        for (Vertex<T> vertex : vertices) {
-            Vertex<T> predecessor = vertex.getPredecessor();
-            if (predecessor != null) {
-                for (Edge<T> edge : vertex.getAdjacents()) {
-                    if (edge.getVertex2().equals(predecessor)) {
-                        minimumSpanningTree.add(edge);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return minimumSpanningTree;
-    }
-
-    /**
-     * The function prints the minimum spanning tree of a graph starting from a
-     * given vertex.
-     * 
-     * @param positionVertex The index position of the starting vertex in the list
-     *                       of vertices. This is
-     *                       used as the starting point for the Prim's algorithm to
-     *                       find the minimum spanning tree.
-     * @return The method `printMST` returns a string representation of the minimum
-     *         spanning tree of a
-     *         graph, starting from a specified vertex. The string contains
-     *         information about each edge in the
-     *         tree, including the vertices it connects and its weight.
-     */
-    @Override
-    public String printMST(int positionVertex) {
-
-        ArrayList<Edge<T>> minimunSpanningTree = (ArrayList<Edge<T>>) prim(vertices.get(positionVertex));
-
-        StringBuilder sb = new StringBuilder("Minimun Spanning Tree");
-
-        for (Edge<T> edge : minimunSpanningTree) {
-
-            sb.append("\n Edge: ").append(edge.getVertex1()).append(" -- ").append(edge.getVertex2())
-                    .append(" Weight:  ").append(edge.getWeight());
-
-        }
-
-        return sb.toString();
-
-    }
-
-    private void floyd_Marshall() {
-        int numVertices = adjacentMatrix.length;
-
-        for (int k = 0; k < numVertices; k++) {
-            for (int i = 0; i < numVertices; i++) {
-                for (int j = 0; j < numVertices; j++) {
-                    if (dist[i][k] != Double.MAX_VALUE && dist[k][j] != Double.MAX_VALUE
-                            && dist[i][k] + dist[k][j] < dist[i][j]) {
-                        dist[i][j] = dist[i][k] + dist[k][j];
-                        next[i][j] = next[i][k];
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * This is a BFS (Breadth-First Search) algorithm implemented in Java to
-     * traverse a graph starting
-     * from a given originBFS vertex.
-     *
-     * @param originBFS The starting vertex for the BFS traversal.
-     */
-    @Override
-    public void BFS(T originBFS) {
-        Queue<Vertex<T>> vQueue = new LinkedList<>();
-        Vertex<T> originBFSVertex = new Vertex<T>(originBFS);
-
-        for (Vertex<T> vertex : vertices) {
-            if (vertex.getValue() != originBFS) {
-                vertex.setColor(Color.WHITE);
-                vertex.setDistance(Integer.MAX_VALUE);
-                vertex.setPredecessor(null);
-            } else {
-                vertex.setColor(Color.GRAY);
-                vertex.setDistance(0);
-                vertex.setPredecessor(null);
-                originBFSVertex = vertex;
-            }
-        }
-
-        vQueue.add(originBFSVertex);
-
-        while (!vQueue.isEmpty()) {
-            Vertex<T> actual = vQueue.poll();
-
-            if (actual != null) {
-                for (Edge<T> edge : actual.getAdjacents()) {
-                    Vertex<T> vertex = edge.getVertex2();
-                    if (vertex.getColor() == Color.WHITE) {
-                        vertex.setColor(Color.GRAY);
-                        vertex.setDistance(actual.getDistance() + 1);
-                        vertex.setPredecessor(actual);
-                        vQueue.add(vertex);
-                    }
-                }
-
-                actual.setColor(Color.BLACK);
-            }
-        }
-    }
-
-    /**
-     * This is a Depth First Search algorithm implementation in Java that visits
-     * each vertex in a graph
-     * and sets its distance, color, and timestamp.
-     *
-     * @param vertex The vertex that is currently being visited in the depth-first
-     *               search algorithm.
-     */
     private void DFSVisit(Vertex<T> vertex) {
         time++;
         vertex.setDistance(time);
         vertex.setColor(Color.GRAY);
 
-        for (Edge<T> edge : vertex.getAdjacents()) {
-            Vertex<T> v = edge.getVertex2();
-            if (v.getColor().equals(Color.WHITE)) {
-                v.setPredecessor(vertex);
-                DFSVisit(v);
+        int vertexIndex = searchVertexIndex(vertex.getValue());
+        int numVertices = vertices.size();
+
+        for (int i = 0; i < numVertices; i++) {
+            if (adjacencyMatrix[vertexIndex][i] != 0) {
+                Vertex<T> v = vertices.get(i);
+                if (v.getColor().equals(Color.WHITE)) {
+                    v.setPredecessor(vertex);
+                    DFSVisit(v);
+                }
             }
         }
 
@@ -313,117 +298,187 @@ public class GraphMatrix<T> implements IGraph<T> {
         vertex.setTime(time);
     }
 
-    public ArrayList<Vertex<T>> getVertices() {
-        return vertices;
+    public void removeVertex(T value) {
+        int indexToRemove = searchVertexIndex(value);
+
+        if (indexToRemove != -1) {
+            int oldSize = vertices.size();
+            int newSize = oldSize - 1;
+
+            double[][] newMatrix = new double[newSize][newSize];
+
+            int rowIndex = 0;
+            int colIndex;
+
+            for (int i = 0; i < oldSize; i++) {
+                if (i != indexToRemove) {
+                    colIndex = 0;
+
+                    for (int j = 0; j < oldSize; j++) {
+                        if (j != indexToRemove) {
+                            newMatrix[rowIndex][colIndex] = adjacencyMatrix[i][j];
+                            colIndex++;
+                        }
+                    }
+
+                    rowIndex++;
+                }
+            }
+
+            vertices.remove(indexToRemove);
+            adjacencyMatrix = newMatrix;
+        }
     }
 
-    /**
-     * This function removes a vertex and all edges associated with it from a graph.
-     *
-     * @param value The value of the vertex that needs to be removed from the graph.
-     */
-    @Override
-    public void removeVertex(T value) {
-        Vertex<T> vertexToRemove = null;
+    public void removeEdge(T value1, T value2) {
+        int index1 = searchVertexIndex(value1);
+        int index2 = searchVertexIndex(value2);
 
-        for (Vertex<T> vertex : vertices) {
-            if (vertex.getValue().equals(value)) {
-                vertexToRemove = vertex;
-                break;
+        if (index1 != -1 && index2 != -1) {
+            adjacencyMatrix[index1][index2] = Double.POSITIVE_INFINITY;
+
+            if (!isDirected) {
+                adjacencyMatrix[index2][index1] = Double.POSITIVE_INFINITY;
             }
         }
+    }
 
-        if (vertexToRemove != null) {
-            vertices.remove(vertexToRemove);
+    public String printGraph() {
+        StringBuilder sb = new StringBuilder();
 
-            for (Vertex<T> vertex : vertices) {
-                ArrayList<Edge<T>> adjacents = vertex.getAdjacents();
+        for (Vertex<T> vertex : vertices) {
+            sb.append(vertex.getValue()).append(": ");
 
-                for (Edge<T> edge : new ArrayList<>(adjacents)) {
-                    if (edge.getVertex2().equals(vertexToRemove)) {
-                        adjacents.remove(edge);
+            int index = searchVertexIndex(vertex.getValue());
+            double[] row = adjacencyMatrix[index];
+
+            for (int i = 0; i < row.length; i++) {
+                double weight = row[i];
+
+                if (weight != Double.POSITIVE_INFINITY) {
+                    sb.append(vertices.get(i).getValue()).append("(").append(weight).append(") ");
+                }
+            }
+
+            sb.append("\n");
+        }
+
+        return sb.toString();
+    }
+
+    public Map<T, Double> dijkstra(T startVertexValue) {
+        Map<T, Double> distances = new HashMap<>();
+        PriorityQueue<Vertex<T>> queue = new PriorityQueue<>();
+
+        for (Vertex<T> vertex : vertices) {
+            if (vertex.getValue().equals(startVertexValue)) {
+                vertex.setDistance(0);
+                distances.put(vertex.getValue(), 0.0);
+            } else {
+                vertex.setDistance(Integer.MAX_VALUE);
+                distances.put(vertex.getValue(), Double.POSITIVE_INFINITY);
+            }
+
+            queue.add(vertex);
+        }
+
+        while (!queue.isEmpty()) {
+            Vertex<T> currentVertex = queue.poll();
+
+            int currentIndex = searchVertexIndex(currentVertex.getValue());
+            for (int i = 0; i < adjacencyMatrix.length; i++) {
+                if (adjacencyMatrix[currentIndex][i] != 0) {
+                    Vertex<T> adjacentVertex = vertices.get(i);
+                    double weight = adjacencyMatrix[currentIndex][i];
+                    double currentDistance = currentVertex.getDistance();
+
+                    if (currentDistance + weight < adjacentVertex.getDistance()) {
+                        queue.remove(adjacentVertex);
+                        adjacentVertex.setDistance((int) (currentDistance + weight));
+                        queue.add(adjacentVertex);
+                        distances.put(adjacentVertex.getValue(), currentDistance + weight);
                     }
                 }
             }
         }
+
+        return distances;
+    }
+
+    public List<Edge<T>> kruskal() {
+        List<Edge<T>> allEdges = new ArrayList<>();
+
+        // Collect all edges from the graph
+        for (int i = 0; i < vertices.size(); i++) {
+            for (int j = 0; j < vertices.size(); j++) {
+                double weight = adjacencyMatrix[i][j];
+                if (weight != Double.POSITIVE_INFINITY) {
+                    allEdges.add(new Edge<>(vertices.get(i), vertices.get(j), weight));
+                }
+            }
+        }
+
+        // Sort edges in ascending order by weight
+        Collections.sort(allEdges);
+
+        // Create a disjoint set to track the connected components
+        DisjointSet<T> disjointSet = new DisjointSet<>(vertices);
+
+        List<Edge<T>> minimumSpanningTree = new ArrayList<>();
+
+        for (Edge<T> edge : allEdges) {
+            Vertex<T> vertex1 = edge.getVertex1();
+            Vertex<T> vertex2 = edge.getVertex2();
+
+            // Check if adding this edge creates a cycle
+            if (!disjointSet.find(vertex1).equals(disjointSet.find(vertex2))) {
+                // The edge does not create a cycle, add it to the minimum spanning tree
+                minimumSpanningTree.add(edge);
+
+                // Merge the sets of the two vertices
+                disjointSet.union(vertex1, vertex2);
+            }
+        }
+
+        return minimumSpanningTree;
     }
 
     /**
-     * This function removes an edge between two vertices in a graph.
+     * This class represents a disjoint set data structure used in Kruskal's
+     * algorithm.
      *
-     * @param value1 The value of the first vertex in the edge to be removed.
-     * @param value2 The value of the second vertex in the edge that needs to be
-     *               removed.
+     * @param <T> The type of the elements in the disjoint set.
      */
-    @Override
-    public void removeEdge(T value1, T value2) {
-        Vertex<T> vertex1 = null;
-        Vertex<T> vertex2 = null;
+    private static class DisjointSet<T> {
+        private Map<Vertex<T>, Vertex<T>> parent;
 
-        for (Vertex<T> vertex : vertices) {
-            if (vertex.getValue().equals(value1)) {
-                vertex1 = vertex;
-            }
+        public DisjointSet(List<Vertex<T>> vertices) {
+            parent = new HashMap<>();
+            makeSets(vertices);
+        }
 
-            if (vertex.getValue().equals(value2)) {
-                vertex2 = vertex;
+        private void makeSets(List<Vertex<T>> vertices) {
+            for (Vertex<T> vertex : vertices) {
+                parent.put(vertex, vertex);
             }
         }
 
-        if (vertex1 != null && vertex2 != null) {
-            ArrayList<Edge<T>> adjacents1 = vertex1.getAdjacents();
-            ArrayList<Edge<T>> adjacents2 = vertex2.getAdjacents();
-
-            Edge<T> edgeToRemove1 = null;
-            Edge<T> edgeToRemove2 = null;
-
-            for (Edge<T> edge : adjacents1) {
-                if (edge.getVertex2().equals(vertex2)) {
-                    edgeToRemove1 = edge;
-                    break;
-                }
+        public Vertex<T> find(Vertex<T> vertex) {
+            if (parent.get(vertex) == vertex) {
+                return vertex;
             }
 
-            for (Edge<T> edge : adjacents2) {
-                if (edge.getVertex2().equals(vertex1)) {
-                    edgeToRemove2 = edge;
-                    break;
-                }
-            }
-
-            if (edgeToRemove1 != null) {
-                adjacents1.remove(edgeToRemove1);
-            }
-
-            if (edgeToRemove2 != null && !isDirected) {
-                adjacents2.remove(edgeToRemove2);
-            }
+            // Path compression
+            Vertex<T> root = find(parent.get(vertex));
+            parent.put(vertex, root);
+            return root;
         }
-    }
 
-    /**
-     * The function prints out information about the vertices and their adjacent
-     * vertices in a graph.
-     *
-     * @return The method `printGraph()` returns a string that contains information
-     *         about each vertex
-     *         in the graph, including its value, distance, time, and adjacent
-     *         vertices.
-     */
-    @Override
-    public String printGraph() {
-        StringBuilder sb = new StringBuilder();
-        for (Vertex<T> vertex : vertices) {
-            sb.append("Vertex: ").append(vertex.getValue()).append("\n");
-            sb.append("Distance: ").append(vertex.getDistance()).append("\n");
-            sb.append("Time: ").append(vertex.getTime()).append("\n");
-            sb.append("Adjacents: ");
-            for (Edge<T> edge : vertex.getAdjacents()) {
-                sb.append(edge.getVertex2().getValue()).append("(").append(edge.getWeight()).append(") ");
-            }
-            sb.append("\n\n");
+        public void union(Vertex<T> vertex1, Vertex<T> vertex2) {
+            Vertex<T> root1 = find(vertex1);
+            Vertex<T> root2 = find(vertex2);
+            parent.put(root1, root2);
         }
-        return sb.toString();
     }
 
     /**
@@ -448,17 +503,21 @@ public class GraphMatrix<T> implements IGraph<T> {
     }
 
     /**
-     * @return int[][] return the adjacentMatrix
+     * @return int[][] return the adjacencyMatrix
      */
-    public int[][] getAdjacentMatrix() {
-        return adjacentMatrix;
+    public double[][] getAdjacencyMatrix() {
+        return adjacencyMatrix;
     }
 
     /**
-     * @param adjacentMatrix the adjacentMatrix to set
+     * @param adjacencyMatrix the adjacencyMatrix to set
      */
-    public void setAdjacentMatrix(int[][] adjacentMatrix) {
-        this.adjacentMatrix = adjacentMatrix;
+    public void setAdjacencyMatrix(double[][] adjacencyMatrix) {
+        this.adjacencyMatrix = adjacencyMatrix;
+    }
+
+    public ArrayList<Vertex<T>> getVertices() {
+        return vertices;
     }
 
 }

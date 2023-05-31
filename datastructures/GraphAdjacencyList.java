@@ -180,9 +180,8 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
             return null;
         }
 
-        List<Edge<T>> minimunSpanningTree = (List<Edge<T>>) primCreator(vertices.get(pos));
+        return primCreator(vertices.get(pos));
 
-        return minimunSpanningTree;
     }
 
     /**
@@ -530,7 +529,7 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
         return stringBuilder.toString();
     }
 
-     /**
+    /**
      * This function applies Kruskal's algorithm to find the minimum spanning tree
      * of the graph.
      *
@@ -609,8 +608,6 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
             parent.put(root1, root2);
         }
     }
-
-
 
     /**
      * @param vertices the vertices to set

@@ -38,11 +38,20 @@ public class Main {
                 + "\n    ************      "
                 + "\n      ********        "
                 + "\n          ***     **  "
-                + "\n            **  ***  *"
-                + "\n              ********"
-                + "\n             ****COL**"
-                + "\n              ********"
-                + "\n             *********\n";
+                + "\n            **  ***  *   **"
+                + "\n              ********* ****     ***"
+                + "\n             ****COL**********    "
+                + "\n              *********************"
+                + "\n                ****************   "
+                + "\n               ******************  "
+                + "\n              *******************"
+                + "\n               ***************"
+                + "\n                ************"
+                + "\n                  ******"
+                + "\n                   ****"
+                + "\n                    ***"
+                + "\n                     ***"
+                + "\n                     **\n";
     }
 
     /**
@@ -53,7 +62,7 @@ public class Main {
     public int getOptionShowMenu() {
         int option = -1;
         while (option == -1) {
-            
+
             System.out.println(
                     "1. Play \t" +
                             "2. Exit\n");
@@ -92,15 +101,15 @@ public class Main {
                 // String msj = controller.loadData();
                 System.out.println("<<GAME STARTED>>");
                 int playOption = 1;
-                int player=1;
+                int player = 1;
                 while (playOption != 0) {
                     System.out.println("PLAYER " + player + " TURN");
                     playOption = getPlayOptionShowMenu();
-                    executePlayOption(playOption,player);
-                    if(player==1){
-                        player=2;
-                    }else{
-                        player=1;
+                    executePlayOption(playOption, player);
+                    if (player == 1) {
+                        player = 2;
+                    } else {
+                        player = 1;
                     }
                 }
 
@@ -117,7 +126,7 @@ public class Main {
     public void executePlayOption(int option, int player) {
         switch (option) {
             case 1:
-                System.out.println(controller.printPlayerTerritories(player-1));
+                System.out.println(controller.printPlayerTerritories(player - 1));
                 break;
             case 2:
 
