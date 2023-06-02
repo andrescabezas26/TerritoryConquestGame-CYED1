@@ -17,14 +17,31 @@ public class Edge<T> implements Comparable<Edge<T>> {
         this.weight = weight;
     }
 
+    /**
+     * This function returns the first vertex of a graph.
+     * 
+     * @return The method is returning an object of type `Vertex<T>`. Specifically, it is returning the
+     * `vertex1` object.
+     */
     public Vertex<T> getVertex1() {
         return vertex1;
     }
 
+    /**
+     * This function returns the second vertex of an edge in a graph.
+     * 
+     * @return The method is returning an object of type `Vertex<T>`. The specific object being
+     * returned is `vertex2`.
+     */
     public Vertex<T> getVertex2() {
         return vertex2;
     }
 
+    /**
+     * The function returns the weight as a double.
+     * 
+     * @return The method is returning the value of the variable "weight" which is of type double.
+     */
     public double getWeight() {
         return weight;
     }

@@ -1,5 +1,9 @@
 package datastructures;
 
+/**
+ * The DistanceInfo class stores information about the distance and previous vertex of a vertex in a
+ * graph.
+ */
 public class DistanceInfo<T> {
     private double distance;
     private Vertex<T> previousVertex;

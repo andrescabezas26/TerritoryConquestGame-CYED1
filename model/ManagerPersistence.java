@@ -2,30 +2,25 @@ package model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-
-import datastructures.*;
-
+/**
+ * The ManagerPersistence class reads and returns the contents of two text files, Countries.txt and
+ * Edges.txt.
+ */
 public class ManagerPersistence {
 
-    private final File PROJECT_DIR = new File(System.getProperty("user.dir"));
-    private Gson gson;
+    public ManagerPersistence() {}
 
-    public ManagerPersistence() {
-        gson = new Gson();
-    }
-
+    /**
+     * This function reads a file containing a list of countries and returns a string with the contents
+     * of the file.
+     * 
+     * @return The method is returning a String containing the contents of the "Countries.txt" file
+     * located in the "data" folder of the project directory. If there is an IOException, the method
+     * will return null.
+     */
     public String getCountries() {
         File projectDir = new File(System.getProperty("user.dir"));
 
@@ -60,6 +55,12 @@ public class ManagerPersistence {
         return null;
     }
 
+    /**
+     * This function reads the contents of a file named Edges.txt and returns it as a string.
+     * 
+     * @return The method is returning a String containing the contents of the "Edges.txt" file located
+     * in the "data" directory of the project. If there is an IOException, the method will return null.
+     */
     public String getEdges() {
         File projectDir = new File(System.getProperty("user.dir"));
 

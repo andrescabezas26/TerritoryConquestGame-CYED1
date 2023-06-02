@@ -671,6 +671,8 @@ public class GraphMatrix<T> implements IGraph<T> {
         return stringBuilder.toString();
     }
 
+    
+
 
     /**
      * @param vertices the vertices to set
@@ -707,8 +709,25 @@ public class GraphMatrix<T> implements IGraph<T> {
         this.adjacencyMatrix = adjacencyMatrix;
     }
 
+    // The above code is a method in Java that returns an ArrayList of vertices. The type of the
+    // vertices is specified by the generic type parameter T.
     public ArrayList<Vertex<T>> getVertices() {
         return vertices;
+    }
+
+    // The above code is a method signature in Java that defines a method named `getAdjacents` which
+    // takes an integer parameter `pos` and returns a list of objects of type `T`. The purpose of this
+    // method is to retrieve the adjacent elements of a given position in a data structure. However,
+    // the implementation of this method is not provided in the code snippet.
+    public List<T> getAdjacents(int pos){
+        List<T> list = new ArrayList<>();
+        for (int i = 0; i < adjacencyMatrix.length; i++) {
+            if(adjacencyMatrix[pos][i]!=Double.POSITIVE_INFINITY && pos!=i){
+                list.add(vertices.get(i).getValue());
+            }
+            
+        }
+        return list;
     }
 
 }

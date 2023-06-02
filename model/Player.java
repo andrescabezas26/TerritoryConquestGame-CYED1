@@ -3,6 +3,10 @@ package model;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * The Player class represents a player in a game with properties such as name, conquered territories,
+ * troops, and score.
+ */
 public class Player {
 
     private String name;
@@ -24,10 +28,24 @@ public class Player {
         return conquistedCountries.get(conquistedCountries.size() - 1);
     }
 
+    /**
+     * The function returns the index of the last element in the "conquistedCountries" list.
+     * 
+     * @return The method `locationInt()` is returning an integer value which is the size of the
+     * `conquistedCountries` list minus 1.
+     */
     public int locationInt(){
         return conquistedCountries.size()-1;
     }
 
+    /**
+     * This Java function returns the index of a given territory in a list of conquered countries.
+     * 
+     * @param terry a String representing the name of a territory.
+     * @return The method returns an integer value, which is the index of the specified territory in
+     * the list of conquered countries. If the territory is not found in the list, the method returns
+     * 0.
+     */
     public int indexTerritory(String terry){
         for (int index = 0; index < conquistedCountries.size(); index++) {
             if (terry.equals(conquistedCountries.get(index))) {
@@ -37,6 +55,16 @@ public class Player {
         return 0;
     }
 
+    /**
+     * The function swaps the positions of two elements in a list of conquered countries based on their
+     * indices.
+     * 
+     * @param index1 The first index or position of the element to be swapped in the
+     * "conquistedCountries" list.
+     * @param index2 The parameter "index2" is a String variable representing the index or position of
+     * a territory in a list called "conquistedCountries". This method uses the "Collections.swap"
+     * method to swap the positions of two territories in the list based on their indexes.
+     */
     public void swap(String index1, String index2) {
         Collections.swap(conquistedCountries, indexTerritory(index1), indexTerritory(index2));
     }

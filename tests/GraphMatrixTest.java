@@ -11,10 +11,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The GraphMatrixTest class contains JUnit tests for the
+ * GraphMatrix class, which
+ * represents a graph using an adjacency matrix data structure.
+ */
 public class GraphMatrixTest {
 
     private GraphMatrix<Integer> graph;
