@@ -19,7 +19,7 @@ import java.util.Set;
  * 
  * @param <T>
  */
-public class GraphMatrix<T> {
+public class GraphMatrix<T> implements IGraph<T> {
     private int time;
     private ArrayList<Vertex<T>> vertices;
     private boolean isDirected;
@@ -32,24 +32,24 @@ public class GraphMatrix<T> {
         this.adjacencyMatrix = new double[0][0];
     }
 
-    /*
-     * private void initializeDistances() {
-     * int numVertices = adjacencyMatrix.length;
+    /**
+     * This function adds a new vertex to a graph represented by an adjacency
+     * matrix, checking if a
+     * vertex with the same value already exists.
      * 
-     * for (int i = 0; i < numVertices; i++) {
-     * for (int j = 0; j < numVertices; j++) {
-     * dist[i][j] = adjacencyMatrix[i][j];
-     * 
-     * if (i != j && adjacencyMatrix[i][j] != Double.MAX_VALUE) {
-     * next[i][j] = j;
-     * } else {
-     * next[i][j] = -1;
-     * }
-     * }
-     * }
-     * }
+     * @param vertexToAdd The vertex that needs to be added to the graph. It is of
+     *                    type T, which means
+     *                    it can be any data type such as Integer, String, or custom
+     *                    objects.
+     * @return The method returns a String message indicating whether the vertex was
+     *         successfully added
+     *         or not. If a vertex with the same value already exists, the message
+     *         "Cannot add the vertex (a
+     *         vertex with the same value already exists)" is returned. Otherwise,
+     *         the message "The vertex has
+     *         been added" is returned.
      */
-
+    @Override
     public String addVertex(T vertexToAdd) {
         for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(vertexToAdd)) {
@@ -74,9 +74,23 @@ public class GraphMatrix<T> {
         return "The vertex has been added";
     }
 
+    /**
+     * This function adds an edge between two vertices with a given weight in an
+     * adjacency matrix
+     * representation of a graph.
+     * 
+     * @param value1 The value of the first vertex in the edge to be added.
+     * @param value2 The value of the second vertex to be connected by the edge.
+     * @param weight The weight parameter represents the weight or cost of the edge
+     *               between two
+     *               vertices in a graph. It is a numerical value that can be used
+     *               to represent the distance, time,
+     *               or any other metric associated with the edge.
+     */
+    @Override
     public void addEdge(T value1, T value2, double weight) {
-        int index1 = searchVertexIndex(value1);
-        int index2 = searchVertexIndex(value2);
+        int index1 = searchVertex(value1);
+        int index2 = searchVertex(value2);
 
         if (index1 != -1 && index2 != -1) {
             adjacencyMatrix[index1][index2] = weight;
@@ -87,7 +101,21 @@ public class GraphMatrix<T> {
         }
     }
 
-    public int searchVertexIndex(T value) {
+    /**
+     * This function searches for a vertex with a given value in a list of vertices
+     * and returns its
+     * index, or -1 if it is not found.
+     * 
+     * @param value The value of the vertex that we are searching for in the list of
+     *              vertices.
+     * @return The method is returning an integer value which represents the index
+     *         of the vertex in the
+     *         list of vertices. If the vertex with the given value is found, its
+     *         index is returned. If it is
+     *         not found, the method returns -1.
+     */
+    @Override
+    public int searchVertex(T value) {
         for (int i = 0; i < vertices.size(); i++) {
             if (vertices.get(i).getValue().equals(value)) {
                 return i;
@@ -97,15 +125,25 @@ public class GraphMatrix<T> {
         return -1;
     }
 
-    public Vertex<T> searchVertex(T value) {
-        for (Vertex<T> vertex : vertices) {
-            if (vertex.getValue().equals(value)) {
-                return vertex;
-            }
-        }
-        return null;
-    }
-
+    /**
+     * This function implements Prim's algorithm to find the minimum spanning tree
+     * of a graph
+     * represented by an adjacency matrix.
+     * 
+     * @param startVertex     The starting vertex for the Prim's algorithm to find
+     *                        the minimum spanning
+     *                        tree.
+     * @param adjacencyMatrix The adjacency matrix is a 2D array that represents the
+     *                        weighted edges
+     *                        between vertices in a graph. The rows and columns of
+     *                        the matrix correspond to the vertices, and
+     *                        the values in the matrix represent the weights of the
+     *                        edges between those vertices. If there is
+     *                        no edge between two vertices, the corresponding value
+     * @return The method is returning a list of edges that form the minimum
+     *         spanning tree of a graph,
+     *         using the Prim's algorithm.
+     */
     private List<Edge<T>> primCreator(Vertex<T> startVertex, double[][] adjacencyMatrix) {
         int numVertices = adjacencyMatrix.length;
         for (Vertex<T> vertex : vertices) {
@@ -130,7 +168,7 @@ public class GraphMatrix<T> {
             currentVertex.setColor(Color.BLACK);
             visited.add(currentVertex);
 
-            int currentVertexIndex = searchVertexIndex(currentVertex.getValue());
+            int currentVertexIndex = searchVertex(currentVertex.getValue());
 
             for (int i = 0; i < numVertices; i++) {
                 if (adjacencyMatrix[currentVertexIndex][i] != 0 && i != currentVertexIndex) {
@@ -152,8 +190,14 @@ public class GraphMatrix<T> {
         return minimumSpanningTree;
     }
 
-    public List<Edge<T>> prim(T vertexValue, double[][] adjacencyMatrix) {
-        int pos = searchVertexIndex(vertexValue);
+    @Override
+    // The above code is a method signature in Java for implementing the Prim's
+    // algorithm for finding
+    // the minimum spanning tree of a graph. It takes a vertex value as input and
+    // returns a list of
+    // edges that form the minimum spanning tree.
+    public List<Edge<T>> prim(T vertexValue) {
+        int pos = searchVertex(vertexValue);
 
         if (pos == -1) {
             return null;
@@ -162,6 +206,14 @@ public class GraphMatrix<T> {
         return primCreator(vertices.get(pos), adjacencyMatrix);
     }
 
+    @Override
+    // The above code is a method signature in Java that takes a List of Edge
+    // objects as input and
+    // returns a String. The method is likely intended to print out the minimum
+    // spanning tree
+    // represented by the input list of edges. However, the implementation of the
+    // method is not
+    // provided in the code snippet.
     public String printPrim(List<Edge<T>> minimumSpanningTree) {
         if (minimumSpanningTree == null) {
             return "El vértice no existe en el grafo.";
@@ -178,6 +230,13 @@ public class GraphMatrix<T> {
         return sb.toString();
     }
 
+    @Override
+    // The above code is implementing the Floyd-Warshall algorithm for finding the
+    // shortest path
+    // between all pairs of vertices in a weighted graph. It returns a 2D array of
+    // doubles where the
+    // value at index [i][j] represents the shortest distance between vertex i and
+    // vertex j.
     public double[][] floydWarshall() {
         int numVertices = vertices.size();
         double[][] distances = new double[numVertices][numVertices];
@@ -216,11 +275,21 @@ public class GraphMatrix<T> {
         return distances;
     }
 
+    // The above code is defining a method called BFS (Breadth-First Search) that
+    // takes a parameter of
+    // type T (generic type) called originBFS. The method is likely implementing the
+    // BFS algorithm to
+    // traverse a graph or tree data structure starting from the origin node
+    // specified by the
+    // parameter. However, without the full implementation of the method, it is not
+    // possible to
+    // determine the exact functionality of the code.
+    @Override
     public void BFS(T originBFS) {
         Queue<Vertex<T>> vQueue = new LinkedList<>();
 
         int numVertices = vertices.size();
-        int originIndex = searchVertexIndex(originBFS);
+        int originIndex = searchVertex(originBFS);
 
         for (int i = 0; i < numVertices; i++) {
             if (i != originIndex) {
@@ -241,7 +310,7 @@ public class GraphMatrix<T> {
             Vertex<T> actual = vQueue.poll();
 
             if (actual != null) {
-                int actualIndex = searchVertexIndex(actual.getValue());
+                int actualIndex = searchVertex(actual.getValue());
 
                 for (int i = 0; i < numVertices; i++) {
                     if (adjacencyMatrix[actualIndex][i] != 0) {
@@ -260,6 +329,12 @@ public class GraphMatrix<T> {
         }
     }
 
+    // The above code is defining a method called DFS, which is likely short for
+    // Depth-First Search.
+    // However, without the implementation details of the method, it is difficult to
+    // determine exactly
+    // what it does.
+    @Override
     public void DFS() {
         for (Vertex<T> vertex : vertices) {
             vertex.setColor(Color.WHITE);
@@ -275,12 +350,20 @@ public class GraphMatrix<T> {
         }
     }
 
+    // The above code is defining a private method called "DFSVisit" that takes a
+    // parameter of type
+    // "Vertex<T>". This method is likely a part of a Depth-First Search algorithm
+    // implementation. The
+    // code inside the method is not shown, but it is expected to contain the logic
+    // for visiting the
+    // given vertex and recursively visiting its adjacent vertices in a depth-first
+    // manner.
     private void DFSVisit(Vertex<T> vertex) {
         time++;
         vertex.setDistance(time);
         vertex.setColor(Color.GRAY);
 
-        int vertexIndex = searchVertexIndex(vertex.getValue());
+        int vertexIndex = searchVertex(vertex.getValue());
         int numVertices = vertices.size();
 
         for (int i = 0; i < numVertices; i++) {
@@ -298,8 +381,16 @@ public class GraphMatrix<T> {
         vertex.setTime(time);
     }
 
+    // The above code is a method in a Java class that removes a vertex (node) with
+    // a specific value
+    // from a graph data structure. The method takes a parameter "value" which
+    // represents the value of
+    // the vertex to be removed. The implementation of the method depends on the
+    // specific graph data
+    // structure being used.
+    @Override
     public void removeVertex(T value) {
-        int indexToRemove = searchVertexIndex(value);
+        int indexToRemove = searchVertex(value);
 
         if (indexToRemove != -1) {
             int oldSize = vertices.size();
@@ -330,9 +421,15 @@ public class GraphMatrix<T> {
         }
     }
 
+    // The above code is defining a method called `removeEdge` that takes two
+    // parameters of type `T`
+    // (generic type) called `value1` and `value2`. The purpose of this method is to
+    // remove an edge
+    // between two vertices in a graph data structure.
+    @Override
     public void removeEdge(T value1, T value2) {
-        int index1 = searchVertexIndex(value1);
-        int index2 = searchVertexIndex(value2);
+        int index1 = searchVertex(value1);
+        int index2 = searchVertex(value2);
 
         if (index1 != -1 && index2 != -1) {
             adjacencyMatrix[index1][index2] = Double.POSITIVE_INFINITY;
@@ -343,40 +440,78 @@ public class GraphMatrix<T> {
         }
     }
 
+    // The above code is a Java method named `printGraph()` that returns a `String`.
+    // The method likely
+    // contains code to generate and format a graph or chart, and the returned
+    // `String` represents the
+    // visual representation of the graph. However, without seeing the
+    // implementation of the method, it
+    // is impossible to determine exactly what the code is doing.
+    @Override
     public String printGraph() {
         StringBuilder sb = new StringBuilder();
 
         for (Vertex<T> vertex : vertices) {
-            sb.append(vertex.getValue()).append(": ");
 
-            int index = searchVertexIndex(vertex.getValue());
+            int index = searchVertex(vertex.getValue());
             double[] row = adjacencyMatrix[index];
 
             for (int i = 0; i < row.length; i++) {
                 double weight = row[i];
 
                 if (weight != Double.POSITIVE_INFINITY) {
-                    sb.append(vertices.get(i).getValue()).append("(").append(weight).append(") ");
+                    sb.append(vertex.getValue()).append(" ---").append("(").append(weight).append(")---> ")
+                            .append(vertices.get(i).getValue()).append("\n");
                 }
             }
 
-            sb.append("\n");
         }
 
         return sb.toString();
     }
 
-    public Map<T, Double> dijkstra(T startVertexValue) {
-        Map<T, Double> distances = new HashMap<>();
+    // The above code is a Java method that searches for an edge between two
+    // vertices in a graph. It
+    // takes two parameters, vertex1 and vertex2, which represent the two vertices
+    // that the edge
+    // connects. The method returns an Edge object that represents the edge between
+    // the two vertices,
+    // if it exists in the graph.
+    public Edge<T> searchEdge(T vertex1, T vertex2) {
+        int index1 = searchVertex(vertex1);
+        int index2 = searchVertex(vertex2);
+
+        if (index1 != -1 && index2 != -1 && adjacencyMatrix[index1][index2] != 0) {
+            double weight = adjacencyMatrix[index1][index2];
+            Vertex<T> v1 = vertices.get(index1);
+            Vertex<T> v2 = vertices.get(index2);
+            return new Edge<>(v1, v2, weight);
+        }
+
+        return null;
+    }
+
+    // The above code is defining a method named "dijkstra" that takes a parameter
+    // of type T (which is
+    // a generic type) representing the value of the starting vertex. The method
+    // returns a Map object
+    // that maps each vertex to its shortest distance from the starting vertex. This
+    // method implements
+    // Dijkstra's algorithm, which is a graph traversal algorithm that finds the
+    // shortest path between
+    // nodes in a weighted graph.
+    @Override
+    public Map<T, DistanceInfo<T>> dijkstra(T startVertexValue) {
+        Map<T, DistanceInfo<T>> distances = new HashMap<>();
         PriorityQueue<Vertex<T>> queue = new PriorityQueue<>();
 
         for (Vertex<T> vertex : vertices) {
             if (vertex.getValue().equals(startVertexValue)) {
                 vertex.setDistance(0);
-                distances.put(vertex.getValue(), 0.0);
+                distances.put(vertex.getValue(), new DistanceInfo<T>(0.0, null));
             } else {
                 vertex.setDistance(Integer.MAX_VALUE);
-                distances.put(vertex.getValue(), Double.POSITIVE_INFINITY);
+                distances.put(vertex.getValue(), new DistanceInfo<T>(Double.POSITIVE_INFINITY, null));
             }
 
             queue.add(vertex);
@@ -385,7 +520,7 @@ public class GraphMatrix<T> {
         while (!queue.isEmpty()) {
             Vertex<T> currentVertex = queue.poll();
 
-            int currentIndex = searchVertexIndex(currentVertex.getValue());
+            int currentIndex = searchVertex(currentVertex.getValue());
             for (int i = 0; i < adjacencyMatrix.length; i++) {
                 if (adjacencyMatrix[currentIndex][i] != 0) {
                     Vertex<T> adjacentVertex = vertices.get(i);
@@ -396,7 +531,8 @@ public class GraphMatrix<T> {
                         queue.remove(adjacentVertex);
                         adjacentVertex.setDistance((int) (currentDistance + weight));
                         queue.add(adjacentVertex);
-                        distances.put(adjacentVertex.getValue(), currentDistance + weight);
+                        distances.put(adjacentVertex.getValue(),
+                                new DistanceInfo<T>(currentDistance + weight, currentVertex));
                     }
                 }
             }
@@ -405,6 +541,11 @@ public class GraphMatrix<T> {
         return distances;
     }
 
+    // The above code is a method in Java that implements Kruskal's algorithm for
+    // finding the minimum
+    // spanning tree of a graph. It returns a list of edges that form the minimum
+    // spanning tree.
+    @Override
     public List<Edge<T>> kruskal() {
         List<Edge<T>> allEdges = new ArrayList<>();
 
@@ -479,6 +620,33 @@ public class GraphMatrix<T> {
             Vertex<T> root2 = find(vertex2);
             parent.put(root1, root2);
         }
+    }
+
+    @Override
+    public String getAdjacentVerticesAsString(T vertexValue) {
+        int pos = searchVertex(vertexValue);
+
+        if (pos == -1) {
+            return "El vértice no existe en el grafo.";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Vértice: ").append(vertices.get(pos).getValue()).append("\n");
+        stringBuilder.append("Adyacentes: ");
+
+        // Obtener la fila correspondiente a vertexValue en la matriz de adyacencia
+        double[] adjacencyRow = adjacencyMatrix[pos];
+
+        // Recorrer los valores de la fila para encontrar los adyacentes
+        for (int i = 0; i < adjacencyRow.length; i++) {
+            if (adjacencyRow[i] != Double.POSITIVE_INFINITY) {
+                // El valor 1 indica que hay una conexión entre los vértices
+                T adjacentVertexValue = vertices.get(i).getValue();
+                stringBuilder.append(adjacentVertexValue).append(" ");
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     /**

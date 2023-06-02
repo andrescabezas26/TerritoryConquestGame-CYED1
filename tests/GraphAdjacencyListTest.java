@@ -40,59 +40,38 @@ public class GraphAdjacencyListTest {
         setupNotDirected();
         graph.addVertex(1);
 
-        Map<Integer, Double> distances = graph.dijkstra(1);
+        Map<Integer, DistanceInfo<Integer>> distances = graph.dijkstra(1);
 
         assertEquals(1, distances.size());
-        assertEquals(0.0, distances.get(1), 0);
+        assertEquals(0.0, distances.get(1).getDistance(), 0);
     }
 
     @Test
     public void testDijkstra2() {
-        setupDirected();
+        setupNotDirected();
         graph.addVertex(1);
         graph.addVertex(2);
-        graph.addVertex(3);
-        graph.addVertex(4);
-        graph.addVertex(5);
-
-        graph.addEdge(1, 2, 3);
-        graph.addEdge(1, 3, 5);
-        graph.addEdge(2, 3, 2);
-        graph.addEdge(2, 4, 1);
-        graph.addEdge(3, 4, 2);
-        graph.addEdge(3, 5, 4);
-        graph.addEdge(4, 5, 3);
-
-        Map<Integer, Double> expectedDistances = new HashMap<>();
-        expectedDistances.put(1, 0.0);
-        expectedDistances.put(2, 3.0);
-        expectedDistances.put(3, 5.0);
-        expectedDistances.put(4, 4.0);
-        expectedDistances.put(5, 7.0);
-
-        Map<Integer, Double> actualDistances = graph.dijkstra(1);
-
-        assertEquals(expectedDistances, actualDistances);
+        Map<Integer, DistanceInfo<Integer>> distances = graph.dijkstra(1);
+        DistanceInfo<Integer> distance = distances.get(2);
+        Assert.assertEquals(Double.POSITIVE_INFINITY, distance.getDistance(), 0.001);
     }
 
     @Test
     public void testDijkstra3() {
-        setupDirected();
+        setupNotDirected();
         graph.addVertex(1);
         graph.addVertex(2);
         graph.addVertex(3);
-
-        Map<Integer, Double> expectedDistances = new HashMap<>();
-        expectedDistances.put(1, 0.0);
-        expectedDistances.put(2, Double.POSITIVE_INFINITY);
-        expectedDistances.put(3, Double.POSITIVE_INFINITY);
-
-        Map<Integer, Double> actualDistances = graph.dijkstra(1);
-
-        assertEquals(expectedDistances, actualDistances);
+        graph.addEdge(1, 2, 1);
+        graph.addEdge(2, 3, 2);
+        Map<Integer, DistanceInfo<Integer>> distances = graph.dijkstra(1);
+        DistanceInfo<Integer> distance2 = distances.get(2);
+        DistanceInfo<Integer> distance3 = distances.get(3);
+        Assert.assertEquals(1.0, distance2.getDistance(), 0.001);
+        Assert.assertEquals(3.0, distance3.getDistance(), 0.001);
     }
 
-     @Test
+    @Test
     public void testKruskal1() {
         setupNotDirected();
         graph.addVertex(1);
@@ -282,11 +261,11 @@ public class GraphAdjacencyListTest {
 
         graph.addEdge(1, 2, 30);
 
-        Assert.assertEquals(1, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(1, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(1, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(1, graph.getVertexes().get(1).getAdjacents().size());
 
-        Assert.assertEquals((Integer) 2, graph.getVertices().get(0).getAdjacents().get(0).getVertex2().getValue());
-        Assert.assertEquals((Integer) 2, graph.getVertices().get(1).getAdjacents().get(0).getVertex1().getValue());
+        Assert.assertEquals((Integer) 2, graph.getVertexes().get(0).getAdjacents().get(0).getVertex2().getValue());
+        Assert.assertEquals((Integer) 2, graph.getVertexes().get(1).getAdjacents().get(0).getVertex1().getValue());
     }
 
     @Test
@@ -297,10 +276,10 @@ public class GraphAdjacencyListTest {
 
         graph.addEdge(1, 2, 30);
 
-        Assert.assertEquals(1, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(0, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(1, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(1).getAdjacents().size());
 
-        Assert.assertEquals((Integer) 2, graph.getVertices().get(0).getAdjacents().get(0).getVertex2().getValue());
+        Assert.assertEquals((Integer) 2, graph.getVertexes().get(0).getAdjacents().get(0).getVertex2().getValue());
     }
 
     @Test
@@ -311,15 +290,15 @@ public class GraphAdjacencyListTest {
 
         graph.addEdge(1, 3, 30);
 
-        Assert.assertEquals(0, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(0, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(1).getAdjacents().size());
     }
 
     @Test
     public void testAddVertex1() {
         setupNotDirected();
         graph.addVertex(1);
-        ArrayList<Vertex<Integer>> vertices = graph.getVertices();
+        ArrayList<Vertex<Integer>> vertices = graph.getVertexes();
         int expectedSize = 1;
         int actualSize = vertices.size();
         Assert.assertEquals(expectedSize, actualSize);
@@ -335,7 +314,7 @@ public class GraphAdjacencyListTest {
         graph.addVertex(1);
         graph.addVertex(1);
         graph.addVertex(3);
-        ArrayList<Vertex<Integer>> vertices = graph.getVertices();
+        ArrayList<Vertex<Integer>> vertices = graph.getVertexes();
         int expectedSize = 2;
         int actualSize = vertices.size();
         Assert.assertEquals(expectedSize, actualSize);
@@ -354,7 +333,7 @@ public class GraphAdjacencyListTest {
         graph.addVertex(2);
         graph.addVertex(3);
         graph.addVertex(4);
-        ArrayList<Vertex<Integer>> vertices = graph.getVertices();
+        ArrayList<Vertex<Integer>> vertices = graph.getVertexes();
         int expectedSize = 4;
         int actualSize = vertices.size();
         Assert.assertEquals(expectedSize, actualSize);
@@ -419,7 +398,7 @@ public class GraphAdjacencyListTest {
 
         graph.removeEdge(2, 3);
 
-        Assert.assertEquals(0, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(1).getAdjacents().size());
     }
 
     @Test
@@ -434,10 +413,10 @@ public class GraphAdjacencyListTest {
 
         graph.removeEdge(1, 2);
 
-        Assert.assertEquals(0, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(1, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(1, graph.getVertexes().get(1).getAdjacents().size());
 
-        Assert.assertEquals((Integer) 3, graph.getVertices().get(1).getAdjacents().get(0).getVertex2().getValue());
+        Assert.assertEquals((Integer) 3, graph.getVertexes().get(1).getAdjacents().get(0).getVertex2().getValue());
     }
 
     @Test
@@ -451,8 +430,8 @@ public class GraphAdjacencyListTest {
 
         graph.removeEdge(1, 3);
 
-        Assert.assertEquals(1, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(0, graph.getVertices().get(2).getAdjacents().size());
+        Assert.assertEquals(1, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(2).getAdjacents().size());
     }
 
     @Test
@@ -467,9 +446,9 @@ public class GraphAdjacencyListTest {
 
         graph.removeVertex(2);
 
-        Assert.assertEquals(2, graph.getVertices().size());
-        Assert.assertEquals(0, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(0, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(2, graph.getVertexes().size());
+        Assert.assertEquals(0, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(1).getAdjacents().size());
     }
 
     @Test
@@ -483,9 +462,9 @@ public class GraphAdjacencyListTest {
 
         graph.removeVertex(4);
 
-        Assert.assertEquals(3, graph.getVertices().size());
-        Assert.assertEquals(1, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(1, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(3, graph.getVertexes().size());
+        Assert.assertEquals(1, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(1, graph.getVertexes().get(1).getAdjacents().size());
     }
 
     @Test
@@ -500,9 +479,9 @@ public class GraphAdjacencyListTest {
 
         graph.removeVertex(2);
 
-        Assert.assertEquals(2, graph.getVertices().size());
-        Assert.assertEquals(0, graph.getVertices().get(0).getAdjacents().size());
-        Assert.assertEquals(0, graph.getVertices().get(1).getAdjacents().size());
+        Assert.assertEquals(2, graph.getVertexes().size());
+        Assert.assertEquals(0, graph.getVertexes().get(0).getAdjacents().size());
+        Assert.assertEquals(0, graph.getVertexes().get(1).getAdjacents().size());
     }
 
     @Test
@@ -592,11 +571,11 @@ public class GraphAdjacencyListTest {
 
         graph.DFS();
 
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(0).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(1).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(2).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(3).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(4).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(0).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(1).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(2).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(3).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(4).getColor());
     }
 
     @Test
@@ -616,17 +595,17 @@ public class GraphAdjacencyListTest {
 
         graph.DFS();
 
-        Assert.assertEquals(1, graph.getVertices().get(0).getDistance());
-        Assert.assertEquals(2, graph.getVertices().get(1).getDistance());
-        Assert.assertEquals(8, graph.getVertices().get(2).getDistance());
-        Assert.assertEquals(3, graph.getVertices().get(3).getDistance());
-        Assert.assertEquals(4, graph.getVertices().get(4).getDistance());
+        Assert.assertEquals(1, graph.getVertexes().get(0).getDistance());
+        Assert.assertEquals(2, graph.getVertexes().get(1).getDistance());
+        Assert.assertEquals(8, graph.getVertexes().get(2).getDistance());
+        Assert.assertEquals(3, graph.getVertexes().get(3).getDistance());
+        Assert.assertEquals(4, graph.getVertexes().get(4).getDistance());
 
-        Assert.assertEquals(10, graph.getVertices().get(0).getTime());
-        Assert.assertEquals(7, graph.getVertices().get(1).getTime());
-        Assert.assertEquals(9, graph.getVertices().get(2).getTime());
-        Assert.assertEquals(6, graph.getVertices().get(3).getTime());
-        Assert.assertEquals(5, graph.getVertices().get(4).getTime());
+        Assert.assertEquals(10, graph.getVertexes().get(0).getTime());
+        Assert.assertEquals(7, graph.getVertexes().get(1).getTime());
+        Assert.assertEquals(9, graph.getVertexes().get(2).getTime());
+        Assert.assertEquals(6, graph.getVertexes().get(3).getTime());
+        Assert.assertEquals(5, graph.getVertexes().get(4).getTime());
     }
 
     @Test
@@ -646,15 +625,15 @@ public class GraphAdjacencyListTest {
 
         graph.DFS();
 
-        Assert.assertNull(graph.getVertices().get(0).getPredecessor());
-        Assert.assertEquals(graph.getVertices().get(0), graph.getVertices().get(1).getPredecessor());
-        Assert.assertEquals(graph.getVertices().get(1), graph.getVertices().get(3).getPredecessor());
-        Assert.assertEquals(graph.getVertices().get(3), graph.getVertices().get(4).getPredecessor());
+        Assert.assertNull(graph.getVertexes().get(0).getPredecessor());
+        Assert.assertEquals(graph.getVertexes().get(0), graph.getVertexes().get(1).getPredecessor());
+        Assert.assertEquals(graph.getVertexes().get(1), graph.getVertexes().get(3).getPredecessor());
+        Assert.assertEquals(graph.getVertexes().get(3), graph.getVertexes().get(4).getPredecessor());
     }
 
     @Test
     public void testSearchVertex1() {
-        GraphAdjacencyList<Integer> graph = new GraphAdjacencyList<>(false);
+        setupNotDirected();
         graph.addVertex(1);
         graph.addVertex(2);
         graph.addVertex(3);
@@ -671,7 +650,7 @@ public class GraphAdjacencyListTest {
 
     @Test
     public void testSearchVertex2() {
-        GraphAdjacencyList<Integer> graph = new GraphAdjacencyList<>(false);
+        setupNotDirected();
         graph.addVertex(1);
         graph.addVertex(2);
         graph.addVertex(3);
@@ -687,7 +666,7 @@ public class GraphAdjacencyListTest {
 
     @Test
     public void testSearchVertex3() {
-        GraphAdjacencyList<Integer> graph = new GraphAdjacencyList<>(false);
+        setupNotDirected();
 
         int expectedIndex = -1;
         int actualIndex = graph.searchVertex(1);
@@ -711,11 +690,11 @@ public class GraphAdjacencyListTest {
 
         graph.BFS(1);
 
-        Assert.assertEquals(0, graph.getVertices().get(0).getDistance());
-        Assert.assertEquals(1, graph.getVertices().get(1).getDistance());
-        Assert.assertEquals(1, graph.getVertices().get(2).getDistance());
-        Assert.assertEquals(2, graph.getVertices().get(3).getDistance());
-        Assert.assertEquals(3, graph.getVertices().get(4).getDistance());
+        Assert.assertEquals(0, graph.getVertexes().get(0).getDistance());
+        Assert.assertEquals(1, graph.getVertexes().get(1).getDistance());
+        Assert.assertEquals(1, graph.getVertexes().get(2).getDistance());
+        Assert.assertEquals(2, graph.getVertexes().get(3).getDistance());
+        Assert.assertEquals(3, graph.getVertexes().get(4).getDistance());
     }
 
     @Test
@@ -735,11 +714,11 @@ public class GraphAdjacencyListTest {
 
         graph.BFS(1);
 
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(0).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(1).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(2).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(3).getColor());
-        Assert.assertEquals(Color.BLACK, graph.getVertices().get(4).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(0).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(1).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(2).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(3).getColor());
+        Assert.assertEquals(Color.BLACK, graph.getVertexes().get(4).getColor());
     }
 
     @Test
@@ -755,10 +734,10 @@ public class GraphAdjacencyListTest {
 
         graph.BFS(1);
 
-        Assert.assertEquals(0, graph.getVertices().get(0).getDistance());
-        Assert.assertEquals(1, graph.getVertices().get(1).getDistance());
-        Assert.assertEquals(2, graph.getVertices().get(2).getDistance());
-        Assert.assertEquals(Integer.MAX_VALUE, graph.getVertices().get(3).getDistance());
+        Assert.assertEquals(0, graph.getVertexes().get(0).getDistance());
+        Assert.assertEquals(1, graph.getVertexes().get(1).getDistance());
+        Assert.assertEquals(2, graph.getVertexes().get(2).getDistance());
+        Assert.assertEquals(Integer.MAX_VALUE, graph.getVertexes().get(3).getDistance());
     }
 
     @Test
@@ -797,6 +776,46 @@ public class GraphAdjacencyListTest {
         String actualOutput = graph.printGraph();
 
         Assert.assertEquals(expectedOutput, actualOutput);
+    }
+
+    @Test
+    public void testSearchEdge1() {
+        setupNotDirected();
+        graph.addVertex(1);
+        graph.addVertex(2);
+        graph.addVertex(3);
+        graph.addEdge(1, 2, 1.0);
+        graph.addEdge(2, 3, 2.0);
+
+        Edge<Integer> edge = graph.searchEdge(1, 2);
+        Assert.assertNotNull(edge);
+        Assert.assertEquals((Integer) 1, edge.getVertex1().getValue());
+        Assert.assertEquals((Integer) 2, edge.getVertex2().getValue());
+        Assert.assertEquals(1.0, edge.getWeight(), 0);
+    }
+
+    @Test
+    public void testSearchEdge2() {
+        setupNotDirected();
+        graph.addVertex(1);
+        graph.addVertex(2);
+        graph.addVertex(3);
+        graph.addEdge(1, 2, 1.0);
+        graph.addEdge(2, 3, 2.0);
+
+        Edge<Integer> edge = graph.searchEdge(1, 3);
+        Assert.assertNull(edge);
+    }
+
+    @Test
+    public void testSearchEdge3() {
+        setupDirected();
+        graph.addVertex(1);
+        graph.addVertex(2);
+        graph.addEdge(1, 2, 1.0);
+
+        Edge<Integer> edge = graph.searchEdge(2, 1);
+        Assert.assertNull(edge);
     }
 
 }

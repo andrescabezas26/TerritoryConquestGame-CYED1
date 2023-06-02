@@ -22,17 +22,24 @@ public interface IGraph<T> {
      */
     public void BFS(T origin);
 
-     /**
-     * This function performs Dijkstra's algorithm on a graph starting from a specified vertex and
-     * returns a map of the shortest distances to each vertex from the starting vertex.
+    /**
+     * This function performs Dijkstra's algorithm on a graph starting from a
+     * specified vertex and
+     * returns a map of the shortest distances to each vertex from the starting
+     * vertex.
      * 
-     * @param startVertexValue startVertexValue is the value of the vertex from which the Dijkstra's
-     * algorithm will start finding the shortest path to all other vertices in the graph. In other
-     * words, it is the starting point or the source vertex for the algorithm.
-     * @return The method `dijkstra` is returning a `Map` object that maps a vertex of type `T` to a
-     * `Double` value representing the shortest distance from the start vertex to that vertex.
+     * @param startVertexValue startVertexValue is the value of the vertex from
+     *                         which the Dijkstra's
+     *                         algorithm will start finding the shortest path to all
+     *                         other vertices in the graph. In other
+     *                         words, it is the starting point or the source vertex
+     *                         for the algorithm.
+     * @return The method `dijkstra` is returning a `Map` object that maps a vertex
+     *         of type `T` to a
+     *         `Double` value representing the shortest distance from the start
+     *         vertex to that vertex.
      */
-    public Map<T, Double> dijkstra(T startVertexValue);
+    public Map<T, DistanceInfo<T>> dijkstra(T startVertexValue);
 
     /**
      * The function returns a list of edges using the Prim's algorithm for a given
@@ -181,5 +188,16 @@ public interface IGraph<T> {
      *         the given value.
      */
     public String getAdjacentVerticesAsString(T vertexValue);
+
+    /**
+     * This function searches for an edge between two vertices.
+     * 
+     * @param vertex1 The first vertex of the edge that we are searching for. It is
+     *                of type T,
+     *                where T is the type of data stored in the vertex.
+     * @param vertex2 The second vertex of the edge that we are searching for.
+     * @return The method `searchEdge` is returning an object of type `Edge<T>`.
+     */
+    public Edge<T> searchEdge(T vertex1, T vertex2);
 
 }

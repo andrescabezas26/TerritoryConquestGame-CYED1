@@ -1,5 +1,10 @@
 package datastructures;
 
+/**
+ * The Edge class represents an edge between two vertices in a graph, with a
+ * weight and a method for
+ * comparing edges based on their weights.
+ */
 public class Edge<T> implements Comparable<Edge<T>> {
 
     private Vertex<T> vertex1;
@@ -25,6 +30,15 @@ public class Edge<T> implements Comparable<Edge<T>> {
     }
 
     @Override
+    // `public int compareTo(Edge<T> otherEdge)` is a method that compares the
+    // weight of two edges. It
+    // is used to implement the Comparable interface, which allows edges to be
+    // sorted based on their
+    // weights. The method returns -1 if the weight of the current edge is less than
+    // the weight of the
+    // other edge, 1 if the weight of the current edge is greater than the weight of
+    // the other edge,
+    // and 0 if the weights are equal.
     public int compareTo(Edge<T> otherEdge) {
         if (this.weight < otherEdge.weight) {
             return -1;
