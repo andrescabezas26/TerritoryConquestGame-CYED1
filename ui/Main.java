@@ -8,14 +8,18 @@ public class Main {
     private Scanner reader;
     private Game controller;
     private boolean finish;
+    private int player;
 
     public Main() {
         reader = new Scanner(System.in);
         controller = new Game();
+        player = 0;
     }
 
     public static void main(String[] args) {
         Main main = new Main();
+
+        main.getOptionMatrixOrList();
 
         System.out.println("\n<<<<< Welcome to Territory Conquest Game >>>>>");
 
@@ -54,6 +58,31 @@ public class Main {
                 + "\n                     **\n";
     }
 
+     /**
+     * getOptionMatrixOrList: Get the option 
+     *
+     * @return int
+     */
+    public void getOptionMatrixOrList() {
+        int option = -1;
+        while (option == -1) {
+
+            System.out.println(
+                    "1. Adjacency list \t" +
+                    "2. Adjacency matrix\n");
+
+            option = validateIntegerOption();
+        }
+
+        if(option == 1){
+            controller.setIsMatrix(false);
+        }else if(option == -2){
+            controller.setIsMatrix(false);
+        }
+
+      
+    }
+
     /**
      * getOptionMenu: Get the option of the menu
      *
@@ -82,7 +111,10 @@ public class Main {
                             "2. See Actual Territory\n" +
                             "3. See Minimum Path to a Territory\n" +
                             "4. Conquist Territory\n" +
-                            "5. Give up \n");
+                            "5. Change Actual Territory\n" +
+                            "6. See militar strategy (COST: 10000 TROOPS)\n" +
+                            "7. See all Territories\n" +
+                            "8. Give up \n");
 
             option = validateIntegerOption();
         }
@@ -109,19 +141,10 @@ public class Main {
 
                 System.out.println("\n<<GAME STARTED>>");
                 int playOption = 1;
-                int player = 1;
-                String name = name1;
-                while (playOption != 0) {
-                    System.out.println("PLAYER " + name.toUpperCase() + " TURN");
+                while (playOption != 8) {
+                    System.out.println("\n" + controller.getName(player).toUpperCase() + " TURN");
                     playOption = getPlayOptionShowMenu();
-                    executePlayOption(playOption, player);
-                    if (player == 1) {
-                        player = 2;
-                        name = name2;
-                    } else {
-                        player = 1;
-                        name = name1;
-                    }
+                    executePlayOption(playOption);
                     if (finish) {
                         break;
                     }
@@ -129,7 +152,7 @@ public class Main {
 
                 break;
             case 2:
-                System.out.println("███▓▒░FINISH GAME░▒▓███");
+                System.out.println("███▓▒░THANKS FOR PLAYING░▒▓███");
                 break;
             default:
                 System.out.println("Invalid option");
@@ -137,17 +160,19 @@ public class Main {
         }
     }
 
-    public void executePlayOption(int option, int player) {
+    public void executePlayOption(int option) {
         switch (option) {
             case 1:
                 // See Conquested Territories
-                System.out.println(controller.printPlayerTerritories(player - 1));
-                executePlayOption(option, player);
+                System.out.println(controller.printPlayerTerritories(player));
+                int op = getPlayOptionShowMenu();
+                executePlayOption(op);
                 break;
             case 2:
                 // See Actual Territory
-                System.out.println(controller.actualTerritory(player - 1));
-                executePlayOption(option, player);
+                System.out.println(controller.actualTerritory(player));
+                op = getPlayOptionShowMenu();
+                executePlayOption(op);
                 break;
             case 3:
                 // See Minimum Path to a Territory
@@ -157,13 +182,47 @@ public class Main {
                 System.out.println("\n Enter the name of territory of finish");
                 String territoryTwo = reader.nextLine();
                 System.out.println(controller.printTerritoryMinimumPath(territoryStart, territoryTwo));
-                executePlayOption(option, player);
+                op = getPlayOptionShowMenu();
+                executePlayOption(op); 
                 break;
             case 4:
                 // Conquist Territory
-
+                ///FALTA VERIFICAR QUE NO CONQUISTE UNO PREVIAMENTE CONQUISTADO/////////////
+                System.out.println(controller.printAdjacentsAndWeight(player));
+                reader.nextLine();
+                System.out.println("\n Enter the name of Territory that you want to conquist: ");
+                String territory = reader.nextLine();
+                System.out.println(controller.coquistTerritory(player, territory.toUpperCase()));
+                if (this.player == 0) {
+                    this.player = 1;
+                } else {
+                    this.player = 0;
+                }
                 break;
+
             case 5:
+                // Change Actual Territory
+                System.out.println(controller.printPlayerTerritories(player));
+                reader.nextLine();
+                System.out.println("\n Enter the name of Territory that you want to move you (This is free): ");
+                String territoryChange = reader.nextLine();
+                System.out.println(controller.moveTerritory(territoryChange.toUpperCase(), player));
+                break;
+            case 6:
+                // See militar strategy
+                System.out.println(
+                        "This option allows you to see how to conquer all the territories using the least number of troops: \n ");
+                System.out.println(controller.militarStrategyPlayer(player));
+                op = getPlayOptionShowMenu();
+                executePlayOption(op);
+                break;
+            case 7:
+                // Show all territories
+                System.out.println(controller.showAllTerritories());
+                op = getPlayOptionShowMenu();
+                executePlayOption(op);
+                break;
+            case 8:
                 // Give up
                 finishGame(true, player);
                 break;
@@ -176,7 +235,7 @@ public class Main {
     public void finishGame(boolean giveUp, int player) {
         if (giveUp) {
             finish = true;
-            System.out.println("\n\n███▓▒░FINISH GAME░▒▓███\n" + controller.finishForGiveUp(player - 1));
+            System.out.println("\n\n███▓▒░FINISH GAME░▒▓███\n" + controller.finishForGiveUp(player));
         }
     }
 

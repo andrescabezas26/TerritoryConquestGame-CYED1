@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Player {
 
@@ -21,6 +22,23 @@ public class Player {
      */
     public String location() {
         return conquistedCountries.get(conquistedCountries.size() - 1);
+    }
+
+    public int locationInt(){
+        return conquistedCountries.size()-1;
+    }
+
+    public int indexTerritory(String terry){
+        for (int index = 0; index < conquistedCountries.size(); index++) {
+            if (terry.equals(conquistedCountries.get(index))) {
+                return index;
+            }
+        }
+        return 0;
+    }
+
+    public void swap(String index1, String index2) {
+        Collections.swap(conquistedCountries, indexTerritory(index1), indexTerritory(index2));
     }
 
     /**

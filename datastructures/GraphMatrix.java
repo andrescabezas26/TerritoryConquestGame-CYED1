@@ -584,6 +584,28 @@ public class GraphMatrix<T> implements IGraph<T> {
         return minimumSpanningTree;
     }
 
+    public String printTerritories() {
+        StringBuilder sb = new StringBuilder();
+
+        for (Vertex<T> vertex : vertices) {
+
+            int index = searchVertex(vertex.getValue());
+            double[] row = adjacencyMatrix[index];
+
+            for (int i = 0; i < row.length; i++) {
+                double weight = row[i];
+
+                if (weight != Double.POSITIVE_INFINITY) {
+                    sb.append(vertex.getValue()).append(" ---").append("(").append(weight).append(")---> ")
+                            .append(vertices.get(i).getValue()).append("\n");
+                }
+            }
+
+        }
+
+        return sb.toString();
+    }
+
     /**
      * This class represents a disjoint set data structure used in Kruskal's
      * algorithm.
@@ -648,6 +670,7 @@ public class GraphMatrix<T> implements IGraph<T> {
 
         return stringBuilder.toString();
     }
+
 
     /**
      * @param vertices the vertices to set

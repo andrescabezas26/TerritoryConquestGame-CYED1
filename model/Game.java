@@ -9,6 +9,8 @@ public class Game {
     private GraphMatrix<String> graphMatrix;
     private ManagerPersistence managerPersistence;
     private Player[] players;
+    private boolean isMatrix;
+    public static final int COST_MILITAR_STRATEGY = 10000;
 
     public Game() {
         this.graphAdjacencyList = new GraphAdjacencyList<>(true);
@@ -20,6 +22,119 @@ public class Game {
         addCountries();
         addEdges();
         setPlayersTerritories();
+        isMatrix = false;
+    }
+
+    public String getName(int player) {
+        return players[player].getName();
+    }
+
+    public String coquistTerritory(int player, String newTerritoryName) {
+        int newPos = graphAdjacencyList.searchVertex(newTerritoryName);
+        if (newPos == -1) {
+            return "The territory doesn't exists or is misspelled";
+        }
+
+        String startName=players[player].getConquistedCountries().get(players[player].locationInt());
+        boolean isFound = false;
+        for (Edge<String> edge : graphAdjacencyList.getVertexes().get(graphAdjacencyList.searchVertex(startName)).getAdjacents()) {
+            if(edge.getVertex2().getValue().equals(newTerritoryName)){
+                isFound = true;
+                break;
+            }
+        }
+
+        if(!isFound){
+            return "This territory isn't adjacent to " + startName;
+        }
+
+        ///FALTA VERIFICAR QUE NO CONQUISTE UNO PREVIAMENTE CONQUISTADO/////////////
+        
+
+        double troopsCost = graphAdjacencyList
+                .searchEdge(players[player].location(), graphAdjacencyList.getVertexes().get(newPos).getValue())
+                .getWeight();
+
+        if (players[player].getTroops() >= troopsCost) {
+            players[player].addTerrytory(newTerritoryName);
+            players[player].setTroops((int) (players[player].getTroops() - troopsCost));
+            return players[player].getName() + " conquist " + players[player].location() + " troops standing: "
+                    + players[player].getTroops();
+        }
+
+        return "The troops requeried to conquist: " + newTerritoryName + " are: " + troopsCost;
+
+    }
+
+    public String printMilitarStrategy(List<Edge<String>> minimunSpanningTree) {
+
+        if (minimunSpanningTree == null) {
+            return "Mistake with military strategy";
+        }
+
+        StringBuilder sb = new StringBuilder("----MILITAR STRATEGY----");
+
+        for (Edge<String> edge : minimunSpanningTree) {
+
+            sb.append("\n Territory: ").append(edge.getVertex1().getValue()).append(" -- ")
+                    .append(edge.getVertex2().getValue())
+                    .append(" Necessary troops:  ").append(edge.getWeight());
+
+        }
+
+        return sb.toString();
+
+    }
+
+    public String actualTroopsPlayer(int numPlayer) {
+        String msj = "Troops of the player: " + players[numPlayer].getTroops();
+
+        return msj;
+
+    }
+
+    public String militarStrategyPlayer(int numPlayer) {
+
+        String militarStrategyPlayer = "";
+
+        if (isMatrix == false) {
+
+            List<Edge<String>> minimumSpanningTree = graphAdjacencyList.prim(graphAdjacencyList.getVertexes()
+                    .get(graphAdjacencyList.searchVertex(players[numPlayer].location())).getValue());
+            militarStrategyPlayer = printMilitarStrategy(minimumSpanningTree);
+            if (COST_MILITAR_STRATEGY <= players[numPlayer].getTroops()) {
+
+                players[numPlayer].setTroops(players[numPlayer].getTroops() - COST_MILITAR_STRATEGY);
+
+            } else {
+                return "You don't have enough troops";
+            }
+
+        } else {
+
+            List<Edge<String>> minimumSpanningTree = graphMatrix.prim(graphMatrix.getVertices()
+                    .get(graphMatrix.searchVertex(players[numPlayer].location())).getValue());
+            militarStrategyPlayer = printMilitarStrategy(minimumSpanningTree);
+            if (COST_MILITAR_STRATEGY <= players[numPlayer].getTroops()) {
+
+                players[numPlayer].setTroops(players[numPlayer].getTroops() - COST_MILITAR_STRATEGY);
+
+            } else {
+                return "You don't have enough troops";
+            }
+
+        }
+
+        return militarStrategyPlayer;
+
+    }
+
+    public String showAllTerritories() {
+        if (isMatrix) {
+            return graphMatrix.printTerritories();
+        } else {
+            return graphAdjacencyList.printTerritories();
+        }
     }
 
     public void setNamesPlayers(String name1, String name2) {
@@ -28,7 +143,8 @@ public class Game {
     }
 
     public void setPlayersTerritories() {
-        int randomValue = (int) (Math.random() * 50);
+        if(isMatrix == false){
+             int randomValue = (int) (Math.random() * 50);
         players[0].addTerrytory(
                 graphAdjacencyList.getVertexes().get(randomValue).getValue());
         players[0].setScore(1);
@@ -40,6 +156,24 @@ public class Game {
         players[1].addTerrytory(
                 graphAdjacencyList.getVertexes().get(randomValue2).getValue());
         players[1].setScore(1);
+            
+        }else{
+
+             int randomValue = (int) (Math.random() * 50);
+        players[0].addTerrytory(
+                graphMatrix.getVertices().get(randomValue).getValue());
+        players[0].setScore(1);
+
+        int randomValue2 = 0;
+        do {
+            randomValue2 = (int) (Math.random() * 50);
+        } while (randomValue == randomValue2);
+        players[1].addTerrytory(
+                graphMatrix.getVertices().get(randomValue2).getValue());
+        players[1].setScore(1);
+            
+        }
+       
     }
 
     // Imprime territorios conquistados de un player
@@ -66,43 +200,49 @@ public class Game {
      *         the number of troops required to attack them.
      */
     public String printAdjacentsAndWeight(int player) {
+
+        String msjj = "";
         StringBuilder msj = new StringBuilder();
-        msj.append("TERRITORY   TROOPS_REQUIRED");
-        for (int i = 0; i < players[player].getConquistedCountries().size(); i++) {
-            ArrayList<Vertex<String>> adjacents = graphAdjacencyList.getAdjacencyList().get(graphAdjacencyList.searchVertex(players[player].getConquistedCountries().get(i))).getAdjacents();
-            for (Vertex<String> adjacent : adjacents) {
-                if(!players[0].isTerritoryConquisted(adjacent.getValue()) && !players[1].isTerritoryConquisted(adjacent.getValue())){
-                    msj.append(adjacent.getValue()).append(" " + adjacent.getWeight());
-                }
+        
+        if(!isMatrix){
+
+              msjj = "TERRITORY   TROOPS_REQUIRED";
+        ArrayList<Edge<String>> adjacents = graphAdjacencyList.getVertexes()
+                .get(graphAdjacencyList.searchVertex(players[player].location())).getAdjacents();
+        msj = new StringBuilder();
+        for (int j = 0; j < adjacents.size(); j++) {
+            if (!players[0].isTerritoryConquisted(adjacents.get(j).getVertex2().getValue())
+                    && !players[1].isTerritoryConquisted(adjacents.get(j).getVertex2().getValue())) {
+                msj.append("\n" + (j + 1) + ") ").append(adjacents.get(j).getVertex2().getValue())
+                        .append("  " + adjacents.get(j).getWeight());
             }
-            msj.append("\n" + (i + 1) + ") ").append(getAdjacents.get(i).getVertex2().getValue())
-                    .append(" " + getAdjacents.get(i).getWeight());
         }
-        return msj.toString();
-    }
-
-    public String printTerritoryAdjacentsByIndex(int posTerritory, int player) {
-        String territoryName = players[player].getConquistedCountries().get(posTerritory);
-        int graphPos = graphAdjacencyList.searchVertex(territoryName);
-        return graphAdjacencyList
-                .getVertexes()
-                .get(graphPos)
-                .printAdjacentsAndWeight();
-    }
-
-    public String printTerritoryAdjacentsByName(String territoryName) {
-        if (graphAdjacencyList.searchVertex(territoryName.toUpperCase()) == -1) {
-            return "This territory doesn't exists or is misspelled";
+        if (msj.toString().isEmpty()) {
+            return "No territories available to conquest in " + players[player].location();
         }
-        String territory = graphAdjacencyList
-                .getVertexes()
-                .get(graphAdjacencyList.searchVertex(territoryName.toUpperCase()))
-                .getValue();
-        int graphPos = graphAdjacencyList.searchVertex(territoryName);
-        return graphAdjacencyList
-                .getVertexes()
-                .get(graphPos)
-                .printAdjacentsAndWeight();
+        
+
+        }else{
+
+            msjj = "TERRITORY   TROOPS_REQUIRED";
+        ArrayList<Edge<String>> adjacents = graphMatrix.getVertices()
+                .get(graphMatrix.searchVertex(players[player].location())).getAdjacents();
+        msj = new StringBuilder();
+        for (int j = 0; j < adjacents.size(); j++) {
+            if (!players[0].isTerritoryConquisted(adjacents.get(j).getVertex2().getValue())
+                    && !players[1].isTerritoryConquisted(adjacents.get(j).getVertex2().getValue())) {
+                msj.append("\n" + (j + 1) + ") ").append(adjacents.get(j).getVertex2().getValue())
+                        .append("  " + adjacents.get(j).getWeight());
+            }
+        }
+        if (msj.toString().isEmpty()) {
+            return "No territories available to conquest in " + players[player].location();
+        }
+            
+        }
+
+        return msjj + msj.toString();
+      
     }
 
     public String printTerritoryMinimumPath(
@@ -216,6 +356,17 @@ public class Game {
 
     }
 
+    public String moveTerritory(String territory, int player) {
+        if (players[player].isTerritoryConquisted(territory)) {
+            players[player].swap(territory, players[player].location());
+            return "Now you Territory Actual is " + players[player].location();
+        } else {
+            return "This Territory isn't conquisted";
+        }
+    }
+
+    
+
     /**
      * @return ManagerPersistence return the managerPersistence
      */
@@ -243,4 +394,47 @@ public class Game {
     public void setPlayers(Player[] players) {
         this.players = players;
     }
+
+    /**
+     * @return GraphAdjacencyList<String> return the graphAdjacencyList
+     */
+    public GraphAdjacencyList<String> getGraphAdjacencyList() {
+        return graphAdjacencyList;
+    }
+
+    /**
+     * @param graphAdjacencyList the graphAdjacencyList to set
+     */
+    public void setGraphAdjacencyList(GraphAdjacencyList<String> graphAdjacencyList) {
+        this.graphAdjacencyList = graphAdjacencyList;
+    }
+
+    /**
+     * @return GraphMatrix<String> return the graphMatrix
+     */
+    public GraphMatrix<String> getGraphMatrix() {
+        return graphMatrix;
+    }
+
+    /**
+     * @param graphMatrix the graphMatrix to set
+     */
+    public void setGraphMatrix(GraphMatrix<String> graphMatrix) {
+        this.graphMatrix = graphMatrix;
+    }
+
+    /**
+     * @return boolean return the isMatrix
+     */
+    public boolean isIsMatrix() {
+        return isMatrix;
+    }
+
+    /**
+     * @param isMatrix the isMatrix to set
+     */
+    public void setIsMatrix(boolean isMatrix) {
+        this.isMatrix = isMatrix;
+    }
+
 }

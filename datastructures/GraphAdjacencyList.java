@@ -267,6 +267,18 @@ public class GraphAdjacencyList<T> implements IGraph<T> {
         return distances;
     }
 
+    public String printTerritories() {
+        StringBuilder sb = new StringBuilder();
+        for (Vertex<T> vertex : vertexes) {
+            for (Edge<T> edge : vertex.getAdjacents()) {
+                sb.append(vertex.getValue()).append(" ---").append("(").append(edge.getWeight()).append(")---> ")
+                            .append(edge.getVertex2().getValue()).append("\n");
+            }
+        }
+        sb.append("\n");
+        return sb.toString();
+    }
+
     /**
      * This function implements Dijkstra's algorithm to find the shortest path from
      * a given vertex to all other vertexes in the graph.
