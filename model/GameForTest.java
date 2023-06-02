@@ -170,7 +170,7 @@ public class GameForTest {
                 "REINO_UNIDO,PAISES_BAJOS,6925\n" +
                 "REINO_UNIDO,CANADA,4869\n" +
                 "FRANCIA,ALEMANIA,3084\n" +
-                "FRANCIA,REINO_UNIDO,5003" +
+                "FRANCIA,REINO_UNIDO,5003\n" +
                 "FRANCIA,ITALIA,6687\n" +
                 "FRANCIA,ESPANA,9754\n" +
                 "ITALIA,FRANCIA,7516\n" +
@@ -830,7 +830,7 @@ public class GameForTest {
                 " was: " +
                 score1 +
                 "\nThe Score of " +
-                players[0].getName().toUpperCase() +
+                players[1].getName().toUpperCase() +
                 " was: " +
                 score2;
         if (score1 > score2) {
@@ -884,7 +884,7 @@ public class GameForTest {
     public String moveTerritory(String territory, int player) {
         if (players[player].isTerritoryConquisted(territory)) {
             players[player].swap(territory, players[player].location());
-            return "Now you Territory Actual is " + players[player].location();
+            return "Now your Territory Actual is " + players[player].location();
         } else {
             return "This Territory isn't conquisted";
         }
