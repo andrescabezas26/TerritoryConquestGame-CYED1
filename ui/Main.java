@@ -249,7 +249,7 @@ System.out.println("\n" + controller.getName(player).toUpperCase() + " TURN");
                 String territoryStart = reader.nextLine();
                 System.out.println("\n Enter the name of territory of finish");
                 String territoryTwo = reader.nextLine();
-                System.out.println(controller.printTerritoryMinimumPath(territoryStart, territoryTwo));
+                System.out.println(controller.printTerritoryMinimumPath(territoryStart.toUpperCase(), territoryTwo.toUpperCase()));
                 op = getPlayOptionShowMenu();
                 executePlayOption(op);
                 break;

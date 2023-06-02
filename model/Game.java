@@ -1,5 +1,10 @@
 package model;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 import datastructures.*;
 import java.util.*;
 
@@ -29,6 +34,92 @@ public class Game {
         isMatrix = false;
     }
 
+    public String getCountries() {
+        File projectDir = new File(System.getProperty("user.dir"));
+
+        FileReader countriesFile = null;
+        BufferedReader lectorC = null;
+
+        try {
+            countriesFile = new FileReader(projectDir + "/data/Countries.txt");
+            lectorC = new BufferedReader(countriesFile);
+
+            String linea = lectorC.readLine();
+            String countries = "";
+
+            while (linea != null) {
+                countries += linea + "\n";
+                linea = lectorC.readLine();
+            }
+
+            return countries;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (lectorC != null)
+                    lectorC.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This function reads the contents of a file named Edges.txt and returns it as a string.
+     * 
+     * @return The method is returning a String containing the contents of the "Edges.txt" file located
+     * in the "data" directory of the project. If there is an IOException, the method will return null.
+     */
+    public String getEdges() {
+        File projectDir = new File(System.getProperty("user.dir"));
+
+        FileReader countriesFile = null;
+        BufferedReader lectorC = null;
+
+        try {
+            countriesFile = new FileReader(projectDir + "/data/Edges.txt");
+            lectorC = new BufferedReader(countriesFile);
+
+            String linea = lectorC.readLine();
+            String countries = "";
+
+            while (linea != null) {
+                countries += linea + "\n";
+                linea = lectorC.readLine();
+            }
+
+            return countries;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (lectorC != null)
+                    lectorC.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * The function adds countries as vertices to two different graph data structures.
+     */
+    public void addCountries() {
+        String[] countries = getCountries().split("\n");
+        for (String country : countries) {
+            graphAdjacencyList.addVertex(country);
+            graphMatrix.addVertex(country);
+        }
+    }
+
     /**
      * This Java function returns the name of a player based on their index in an array of players.
      * 
@@ -43,7 +134,7 @@ public class Game {
         return players[player].getName();
     }
     
-  
+    
 
     /**
      * This function verifies if the game has finished based on the number of troops and conquered
@@ -519,17 +610,7 @@ public class Game {
         }
     }
 
- 
-    /**
-     * The function adds countries as vertices to two different graph data structures.
-     */
-    public void addCountries() {
-        String[] countries = managerPersistence.getCountries().split("\n");
-        for (String country : countries) {
-            graphAdjacencyList.addVertex(country);
-            graphMatrix.addVertex(country);
-        }
-    }
+
 
     
     /**
@@ -537,7 +618,7 @@ public class Game {
      * from a persistence manager.
      */
     public void addEdges() {
-        String[] countriesEdges = managerPersistence.getEdges().split("\n");
+        String[] countriesEdges = getEdges().split("\n");
         for (String countryEdges : countriesEdges) {
             String[] edges = countryEdges.split(",");
             graphAdjacencyList.addEdge(
