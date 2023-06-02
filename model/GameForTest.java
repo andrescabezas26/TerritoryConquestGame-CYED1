@@ -8,19 +8,19 @@ import java.util.*;
  * managing players,
  * territories, and game mechanics.
  */
-public class Game {
+public class GameForTest {
 
     private GraphAdjacencyList<String> graphAdjacencyList;
     private GraphMatrix<String> graphMatrix;
-    private ManagerPersistence managerPersistence;
     private Player[] players;
+    private ManagerPersistence managerPersistence;
     private boolean isMatrix;
     public static final int COST_MILITAR_STRATEGY = 10000;
 
-    public Game() {
+    public GameForTest() {
+        this.managerPersistence = new ManagerPersistence();
         this.graphAdjacencyList = new GraphAdjacencyList<>(true);
         this.graphMatrix = new GraphMatrix<>(true);
-        this.managerPersistence = new ManagerPersistence();
         this.players = new Player[2];
         players[0] = new Player("Player 1");
         players[1] = new Player("Player 2");
@@ -35,10 +35,232 @@ public class Game {
      * structures.
      */
     public void addCountries() {
-        String[] countries = managerPersistence.getCountries().split("\n");
-        for (String country : countries) {
+        String countries = "ESTADOS_UNIDOS\n" +
+                "CANADA\n" +
+                "MEXICO\n" +
+                "GUATEMALA\n" +
+                "BELICE\n" +
+                "HONDURAS\n" +
+                "EL_SALVADOR\n" +
+                "NICARAGUA\n" +
+                "COSTA_RICA\n" +
+                "PANAMA\n" +
+                "BRASIL\n" +
+                "ARGENTINA\n" +
+                "COLOMBIA\n" +
+                "PERU\n" +
+                "VENEZUELA\n" +
+                "CHILE\n" +
+                "ECUADOR\n" +
+                "BOLIVIA\n" +
+                "URUGUAY\n" +
+                "NIGERIA\n" +
+                "EGIPTO\n" +
+                "SUDAFRICA\n" +
+                "GHANA\n" +
+                "ARGELIA\n" +
+                "MARRUECOS\n" +
+                "ETIOPIA\n" +
+                "MOZAMBIQUE\n" +
+                "ANGOLA\n" +
+                "RUSIA\n" +
+                "ALEMANIA\n" +
+                "REINO_UNIDO\n" +
+                "FRANCIA\n" +
+                "ITALIA\n" +
+                "ESPANA\n" +
+                "POLONIA\n" +
+                "UCRANIA\n" +
+                "RUMANIA\n" +
+                "PAISES_BAJOS\n" +
+                "CHINA\n" +
+                "INDIA\n" +
+                "JAPON\n" +
+                "COREA_DEL_SUR\n" +
+                "INDONESIA\n" +
+                "PAKISTAN\n" +
+                "TURQUIA\n" +
+                "IRAN\n" +
+                "ARABIA_SAUDITA\n" +
+                "NUEVA_ZELANDA\n" +
+                "AUSTRALIA\n" +
+                "MALASIA\n";
+        String[] countries2 = countries.split("\n");
+        for (String country : countries2) {
             graphAdjacencyList.addVertex(country);
             graphMatrix.addVertex(country);
+        }
+    }
+
+    /**
+     * The function adds edges to a graph data structure from a string
+     * representation of edges obtained
+     * from a persistence manager.
+     */
+    public void addEdges() {
+        String data = "ESTADOS_UNIDOS,CANADA,6218\n" +
+                "ESTADOS_UNIDOS,MEXICO,3287\n" +
+                "ESTADOS_UNIDOS,RUSIA,7284\n" +
+                "CANADA,ESTADOS_UNIDOS,8887\n" +
+                "CANADA,REINO_UNIDO,5903\n" +
+                "MEXICO,ESTADOS_UNIDOS,1569\n" +
+                "MEXICO,GUATEMALA,4131\n" +
+                "MEXICO,BELICE,1224\n" +
+                "GUATEMALA,MEXICO,7528\n" +
+                "GUATEMALA,BELICE,2514\n" +
+                "GUATEMALA,HONDURAS,6362\n" +
+                "GUATEMALA,EL_SALVADOR,4297\n" +
+                "BELICE,GUATEMALA,6146\n" +
+                "BELICE,MEXICO,3939\n" +
+                "BELICE,HONDURAS,1822\n" +
+                "HONDURAS,GUATEMALA,4511\n" +
+                "HONDURAS,EL_SALVADOR,8114\n" +
+                "HONDURAS,NICARAGUA,2765\n" +
+                "EL_SALVADOR,GUATEMALA,9124\n" +
+                "EL_SALVADOR,HONDURAS,3679\n" +
+                "EL_SALVADOR,NICARAGUA,9482\n" +
+                "NICARAGUA,HONDURAS,7035\n" +
+                "NICARAGUA,COSTA_RICA,1356\n" +
+                "NICARAGUA,EL_SALVADOR,4821\n" +
+                "COSTA_RICA,NICARAGUA,9513\n" +
+                "COSTA_RICA,PANAMA,8701\n" +
+                "PANAMA,COSTA_RICA,4216\n" +
+                "PANAMA,COLOMBIA,3599\n" +
+                "BRASIL,ARGENTINA,7591\n" +
+                "BRASIL,COLOMBIA,8499\n" +
+                "BRASIL,PERU,4441\n" +
+                "BRASIL,VENEZUELA,5388\n" +
+                "BRASIL,URUGUAY,6206\n" +
+                "ARGENTINA,BRASIL,2857\n" +
+                "ARGENTINA,BOLIVIA,7411\n" +
+                "ARGENTINA,URUGUAY,6417\n" +
+                "ARGENTINA,CHILE,2804\n" +
+                "COLOMBIA,BRASIL,9636\n" +
+                "COLOMBIA,PERU,5225\n" +
+                "COLOMBIA,VENEZUELA,4091\n" +
+                "COLOMBIA,ECUADOR,3186\n" +
+                "COLOMBIA,PANAMA,7920\n" +
+                "PERU,BRASIL,3799\n" +
+                "PERU,COLOMBIA,5346\n" +
+                "PERU,BOLIVIA,8682\n" +
+                "PERU,ECUADOR,6163\n" +
+                "PERU,CHILE,7843\n" +
+                "VENEZUELA,BRASIL,1397\n" +
+                "VENEZUELA,COLOMBIA,5796\n" +
+                "CHILE,BOLIVIA,9102\n" +
+                "CHILE,ARGENTINA,6701\n" +
+                "CHILE,PERU,6939\n" +
+                "CHILE,NUEVA_ZELANDA,3149\n" +
+                "ECUADOR,COLOMBIA,7301\n" +
+                "ECUADOR,PERU,6234\n" +
+                "BOLIVIA,ARGENTINA,8165\n" +
+                "BOLIVIA,CHILE,6789\n" +
+                "BOLIVIA,PERU,3947\n" +
+                "URUGUAY,ARGENTINA,1747\n" +
+                "URUGUAY,BRASIL,9345\n" +
+                "RUSIA,POLONIA,3362\n" +
+                "RUSIA,UCRANIA,8589\n" +
+                "RUSIA,RUMANIA,7453\n" +
+                "RUSIA,CHINA,9315\n" +
+                "RUSIA,JAPON,7122\n" +
+                "ALEMANIA,FRANCIA,2477\n" +
+                "ALEMANIA,POLONIA,4058\n" +
+                "ALEMANIA,PAISES_BAJOS,2174\n" +
+                "REINO_UNIDO,FRANCIA,1552\n" +
+                "REINO_UNIDO,PAISES_BAJOS,6925\n" +
+                "REINO_UNIDO,CANADA,4869\n" +
+                "FRANCIA,ALEMANIA,3084\n" +
+                "FRANCIA,REINO_UNIDO,5003" +
+                "FRANCIA,ITALIA,6687\n" +
+                "FRANCIA,ESPANA,9754\n" +
+                "ITALIA,FRANCIA,7516\n" +
+                "ITALIA,ESPANA,2005\n" +
+                "ITALIA,ARGELIA,8997\n" +
+                "ESPANA,FRANCIA,4943\n" +
+                "ESPANA,ITALIA,3674\n" +
+                "ESPANA,MARRUECOS,5203\n" +
+                "POLONIA,RUSIA,1547\n" +
+                "POLONIA,ALEMANIA,7293\n" +
+                "POLONIA,UCRANIA,8246\n" +
+                "UCRANIA,RUSIA,4367\n" +
+                "UCRANIA,POLONIA,1875\n" +
+                "UCRANIA,RUMANIA,6199\n" +
+                "RUMANIA,RUSIA,3894\n" +
+                "RUMANIA,UCRANIA,9978\n" +
+                "RUMANIA,TURQUIA,1853\n" +
+                "PAISES_BAJOS,RUSIA,6829\n" +
+                "PAISES_BAJOS,REINO_UNIDO,4486\n" +
+                "PAISES_BAJOS,ALEMANIA,7268\n" +
+                "NIGERIA,EGIPTO,8712\n" +
+                "NIGERIA,SUDAFRICA,1331\n" +
+                "NIGERIA,GHANA,3667\n" +
+                "NIGERIA,ARGELIA,2300\n" +
+                "NIGERIA,ETIOPIA,2100\n" +
+                "EGIPTO,NIGERIA,5263\n" +
+                "EGIPTO,SUDAFRICA,6901\n" +
+                "EGIPTO,TURQUIA,4103\n" +
+                "EGIPTO,ARABIA_SAUDITA,2982\n" +
+                "EGIPTO,ETIOPIA,3000\n" +
+                "EGIPTO,ARGELIA,4000\n" +
+                "SUDAFRICA,NIGERIA,5775\n" +
+                "SUDAFRICA,EGIPTO,8036\n" +
+                "SUDAFRICA,MOZAMBIQUE,9228\n" +
+                "SUDAFRICA,ANGOLA,2937\n" +
+                "SUDAFRICA,GHANA,5584\n" +
+                "ETIOPIA,EGIPTO,1183\n" +
+                "ETIOPIA,ANGOLA,1940\n" +
+                "ETIOPIA,ARABIA_SAUDITA,2300\n" +
+                "ETIOPIA,NIGERIA,1500\n" +
+                "ARGELIA,MARRUECOS,7891\n" +
+                "ARGELIA,ITALIA,4783\n" +
+                "ARGELIA,NIGERIA,1300\n" +
+                "ARGELIA,EGIPTO,2300\n" +
+                "MARRUECOS,ARGELIA,2895\n" +
+                "MARRUECOS,ESPANA,7222\n" +
+                "GHANA,NIGERIA,4744\n" +
+                "GHANA,SUDAFRICA,8115\n" +
+                "MOZAMBIQUE,SUDAFRICA,6241\n" +
+                "ANGOLA,SUDAFRICA,3496\n" +
+                "ANGOLA,ETIOPIA,2333\n" +
+                "CHINA,RUSIA,8162\n" +
+                "CHINA,INDONESIA,4488\n" +
+                "CHINA,INDIA,7066\n" +
+                "INDIA,PAKISTAN,9451\n" +
+                "INDIA,CHINA,2752\n" +
+                "JAPON,COREA_DEL_SUR,5613\n" +
+                "COREA_DEL_SUR,JAPON,8789\n" +
+                "INDONESIA,PAKISTAN,1745\n" +
+                "INDONESIA,CHINA,5158\n" +
+                "PAKISTAN,INDIA,2972\n" +
+                "PAKISTAN,INDONESIA,7736\n" +
+                "PAKISTAN,IRAN,2489\n" +
+                "MALASIA,INDIA,6883\n" +
+                "MALASIA,AUSTRALIA,8356\n" +
+                "TURQUIA,IRAN,4507\n" +
+                "TURQUIA,ARABIA_SAUDITA,6726\n" +
+                "TURQUIA,EGIPTO,8029\n" +
+                "TURQUIA,RUMANIA,4213\n" +
+                "IRAN,TURQUIA,3907\n" +
+                "IRAN,PAKISTAN,7475\n" +
+                "IRAN,ARABIA_SAUDITA,9327\n" +
+                "ARABIA_SAUDITA,TURQUIA,3131\n" +
+                "ARABIA_SAUDITA,EGIPTO,6089\n" +
+                "ARABIA_SAUDITA,IRAN,8535\n" +
+                "ARABIA_SAUDITA,ETIOPIA,5935\n" +
+                "NUEVA_ZELANDA,AUSTRALIA,5200\n" +
+                "NUEVA_ZELANDA,CHILE,4300\n" +
+                "AUSTRALIA,MALASIA,3900\n" +
+                "AUSTRALIA,NUEVA_ZELANDA,4800\n" +
+                "AUSTRALIA,SUDAFRICA,3200\n" +
+                "SUDAFRICA,AUSTRALIA,5000";
+        String[] countriesEdges = data.split("\n");
+        for (String countryEdges : countriesEdges) {
+            String[] edges = countryEdges.split(",");
+            graphAdjacencyList.addEdge(
+                    edges[0],
+                    edges[1],
+                    Double.parseDouble(edges[2]));
+            graphMatrix.addEdge(edges[0], edges[1], Double.parseDouble(edges[2]));
         }
     }
 
@@ -583,23 +805,6 @@ public class Game {
             return path;
         } else {
             return Collections.emptyList();
-        }
-    }
-
-    /**
-     * The function adds edges to a graph data structure from a string
-     * representation of edges obtained
-     * from a persistence manager.
-     */
-    public void addEdges() {
-        String[] countriesEdges = managerPersistence.getEdges().split("\n");
-        for (String countryEdges : countriesEdges) {
-            String[] edges = countryEdges.split(",");
-            graphAdjacencyList.addEdge(
-                    edges[0],
-                    edges[1],
-                    Double.parseDouble(edges[2]));
-            graphMatrix.addEdge(edges[0], edges[1], Double.parseDouble(edges[2]));
         }
     }
 
